@@ -10,11 +10,19 @@ export const SPLIT_PRESETS = {
   /** 工作台纵向：SQL 编辑器占主区高度的比例（lg 及以上可拖拽） */
   workspaceEditor: { key: "workspace-editor", defaultRatio: 0.28, bounds: { min: 0.15, max: 0.6 } },
   /** 工作台横向：AI 助手占中段宽度的比例（lg 及以上可拖拽） */
-  workspaceColumns: { key: "workspace-columns", defaultRatio: 0.4, bounds: { min: 0.25, max: 0.6 } },
+  workspaceColumns: {
+    key: "workspace-columns",
+    defaultRatio: 0.4,
+    bounds: { min: 0.25, max: 0.6 },
+  },
   /** R 面板纵向：代码区占面板内容高度的比例 */
   rWorkbench: { key: "r-workbench", defaultRatio: 0.62, bounds: { min: 0.35, max: 0.8 } },
   /** R 面板宽度：占视口宽度的比例（调用方按像素边界换算，默认约 620px） */
-  rWorkbenchWidth: { key: "r-workbench-width", defaultRatio: 0.43, bounds: { min: 0.25, max: 0.85 } },
+  rWorkbenchWidth: {
+    key: "r-workbench-width",
+    defaultRatio: 0.43,
+    bounds: { min: 0.25, max: 0.85 },
+  },
 } as const satisfies Record<string, { key: string; defaultRatio: number; bounds: SplitBounds }>
 
 export interface SplitBounds {
@@ -64,6 +72,9 @@ export function writeStoredRatio(
   }
 }
 
-export function splitStorageKey(key: string, storage: RatioStorage = defaultStorage()): string | null {
+export function splitStorageKey(
+  key: string,
+  storage: RatioStorage = defaultStorage(),
+): string | null {
   return storage ? SPLIT_STORAGE_PREFIX + key : null
 }

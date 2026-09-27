@@ -5,7 +5,10 @@ describe("chart mapping helpers", () => {
   it("creates chart-specific defaults", () => {
     expect(createChartMapping("table")).toEqual({ chartType: "table" })
     expect(createChartMapping("bar")).toEqual({ chartType: "bar", mode: "grouped" })
-    expect(createChartMapping("correlation")).toEqual({ chartType: "correlation", method: "pearson" })
+    expect(createChartMapping("correlation")).toEqual({
+      chartType: "correlation",
+      method: "pearson",
+    })
   })
 
   it("updates only slots supported by the selected chart type", () => {
@@ -16,7 +19,9 @@ describe("chart mapping helpers", () => {
   })
 
   it("removes an optional slot when its value is empty", () => {
-    expect(setMappingSlot({ chartType: "scatter", x: "a", color: "group" }, "color", ""))
-      .toEqual({ chartType: "scatter", x: "a" })
+    expect(setMappingSlot({ chartType: "scatter", x: "a", color: "group" }, "color", "")).toEqual({
+      chartType: "scatter",
+      x: "a",
+    })
   })
 })

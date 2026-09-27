@@ -10,7 +10,9 @@ vi.mock("@/components/ai-visibility-hint", () => ({
   AiVisibilityHint: () => <div data-testid="visibility-hint" />,
 }))
 
-;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+;(
+  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true
 
 function assistant(overrides: Partial<AiAssistant> = {}): AiAssistant {
   return {
@@ -32,13 +34,15 @@ function message(role: ConversationMessage["role"], content: string): Conversati
   return { role, content, createdAt: new Date("2026-09-24T00:00:00Z") }
 }
 
-function renderPanel(props: Partial<{
-  assistant: AiAssistant
-  conversationHistory: ConversationMessage[]
-  schema: Parameters<typeof AiAssistantPanel>[0]["schema"]
-  busy: boolean
-  onReset: () => void
-}> = {}) {
+function renderPanel(
+  props: Partial<{
+    assistant: AiAssistant
+    conversationHistory: ConversationMessage[]
+    schema: Parameters<typeof AiAssistantPanel>[0]["schema"]
+    busy: boolean
+    onReset: () => void
+  }> = {},
+) {
   const container = document.createElement("div")
   document.body.appendChild(container)
   const root: Root = createRoot(container)
@@ -66,14 +70,16 @@ function buttons(container: HTMLElement): HTMLButtonElement[] {
 function sendButton(container: HTMLElement): HTMLButtonElement {
   const all = buttons(container)
   const last = all[all.length - 1]
-  if (!last) throw new Error('面板里一个按钮都没有')
-  if (!/w-7/.test(last.className)) throw new Error(`最后一个按钮不是发送键：class=${last.className}`)
+  if (!last) throw new Error("面板里一个按钮都没有")
+  if (!/w-7/.test(last.className))
+    throw new Error(`最后一个按钮不是发送键：class=${last.className}`)
   return last
 }
 
 function buttonByText(container: HTMLElement, text: string): HTMLButtonElement {
   const matched = buttons(container).filter((b) => b.textContent?.trim() === text)
-  if (matched.length !== 1) throw new Error(`文本「${text}」的按钮应为 1 个，实际 ${matched.length} 个`)
+  if (matched.length !== 1)
+    throw new Error(`文本「${text}」的按钮应为 1 个，实际 ${matched.length} 个`)
   return matched[0] as HTMLButtonElement
 }
 
@@ -95,15 +101,23 @@ describe("AiAssistantPanel", () => {
   })
 
   it("有历史时出现「重置」，点击只转回调（会话 RESET 不归本组件）", () => {
-    const { container, onReset } = renderPanel({ conversationHistory: [message("user", "对比 @orders 与 @customers 的销售趋势")] })
+    const { container, onReset } = renderPanel({
+      conversationHistory: [message("user", "对比 @orders 与 @customers 的销售趋势")],
+    })
     click(buttonByText(container, "重置"))
     expect(onReset).toHaveBeenCalledTimes(1)
   })
 
   it("busy 或 asking 时「重置」禁用", () => {
     const history = [message("user", "问题")]
-    expect(buttonByText(renderPanel({ conversationHistory: history, busy: true }).container, "重置").disabled).toBe(true)
-    const asking = renderPanel({ conversationHistory: history, assistant: assistant({ asking: true }) })
+    expect(
+      buttonByText(renderPanel({ conversationHistory: history, busy: true }).container, "重置")
+        .disabled,
+    ).toBe(true)
+    const asking = renderPanel({
+      conversationHistory: history,
+      assistant: assistant({ asking: true }),
+    })
     expect(buttonByText(asking.container, "重置").disabled).toBe(true)
   })
 

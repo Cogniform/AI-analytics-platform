@@ -47,7 +47,9 @@ describe("escapeRName", () => {
 
 describe("stripDataFrameAssignment", () => {
   it("剥掉多行数据加载块，保留其余分析代码", () => {
-    const code = [buildDataFrameCode(makeDataset()), "", "library(ggplot2)", "summary(df)"].join("\n")
+    const code = [buildDataFrameCode(makeDataset()), "", "library(ggplot2)", "summary(df)"].join(
+      "\n",
+    )
 
     const stripped = stripDataFrameAssignment(code)
 
@@ -102,7 +104,9 @@ describe("formatRValue", () => {
 
   it("formats temporal values as Date or POSIXct", () => {
     expect(formatRValue("2026-01-01", "temporal")).toBe('as.Date("2026-01-01")')
-    expect(formatRValue("2026-01-01T10:00:00", "temporal")).toBe('as.POSIXct("2026-01-01T10:00:00")')
+    expect(formatRValue("2026-01-01T10:00:00", "temporal")).toBe(
+      'as.POSIXct("2026-01-01T10:00:00")',
+    )
   })
 
   it("quotes strings and escapes quotes/backslashes", () => {
@@ -128,7 +132,10 @@ describe("buildDataFrameCode", () => {
   })
 
   it("escapes Chinese column names", () => {
-    const ds = makeDataset({ columns: [{ name: "订单金额", type: "float8", semanticType: "numeric" }], rows: [{ "订单金额": 100 }] })
+    const ds = makeDataset({
+      columns: [{ name: "订单金额", type: "float8", semanticType: "numeric" }],
+      rows: [{ 订单金额: 100 }],
+    })
     expect(buildDataFrameCode(ds)).toContain("`订单金额` = c(100)")
   })
 

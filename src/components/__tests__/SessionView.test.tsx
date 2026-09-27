@@ -8,9 +8,13 @@ vi.mock("@/components/r-workbench", () => ({ RWorkbench: () => null }))
 
 // 图表桩只暴露「收到哪个映射、几行数据」，避免 recharts 在 jsdom 下渲染
 vi.mock("@/components/chart", () => ({
-  Chart: ({ mapping, data }: { mapping: { chartType: string }; data: Record<string, unknown>[] }) => (
-    <div data-testid="stub-chart">{mapping.chartType + ":" + data.length}</div>
-  ),
+  Chart: ({
+    mapping,
+    data,
+  }: {
+    mapping: { chartType: string }
+    data: Record<string, unknown>[]
+  }) => <div data-testid="stub-chart">{mapping.chartType + ":" + data.length}</div>,
 }))
 
 import { SessionView } from "../SessionView"
@@ -57,7 +61,10 @@ const barConfig: AnalysisSession["displayConfig"] = {
   mapping: { chartType: "bar", x: "region", y: "sales" },
 }
 
-const tableConfig: AnalysisSession["displayConfig"] = { chartType: "table", mapping: { chartType: "table" } }
+const tableConfig: AnalysisSession["displayConfig"] = {
+  chartType: "table",
+  mapping: { chartType: "table" },
+}
 
 async function render(session: AnalysisSession, tab: string) {
   const container = document.createElement("div")
@@ -65,18 +72,28 @@ async function render(session: AnalysisSession, tab: string) {
   const root = createRoot(container)
   await act(async () => {
     root.render(
-      <SessionView session={session} connectionId="c1" onMappingChange={() => undefined} onCopySql={() => undefined} tab={tab} />,
+      <SessionView
+        session={session}
+        connectionId="c1"
+        onMappingChange={() => undefined}
+        onCopySql={() => undefined}
+        tab={tab}
+      />,
     )
   })
   return { container, root }
 }
 
 function chartPayloads(container: HTMLElement): string[] {
-  return Array.from(container.querySelectorAll("[data-testid='stub-chart']")).map((element) => element.textContent ?? "")
+  return Array.from(container.querySelectorAll("[data-testid='stub-chart']")).map(
+    (element) => element.textContent ?? "",
+  )
 }
 
 describe("SessionView 结果区", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   afterEach(() => {
     document.body.replaceChildren()

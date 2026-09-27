@@ -24,9 +24,19 @@ const navItems = [
   { href: "/workspace", label: "数据工作台", icon: Terminal },
   { href: "/explorer", label: "数据探索", icon: Search },
   { href: "/queries", label: "查询管理", icon: Clock },
-] as const satisfies readonly { href: string; label: string; icon: ComponentType<{ className?: string }> }[]
+] as const satisfies readonly {
+  href: string
+  label: string
+  icon: ComponentType<{ className?: string }>
+}[]
 
-export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean; onClose?: () => void }) {
+export function Sidebar({
+  mobileOpen = false,
+  onClose,
+}: {
+  mobileOpen?: boolean
+  onClose?: () => void
+}) {
   const pathname = usePathname()
   const router = useRouter()
   const { connection, connectionId } = useConnection()
@@ -76,18 +86,27 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
   }
 
   return (
-    <aside className={cn(
-      "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] text-[var(--sidebar-foreground)] shadow-xl transition-transform md:relative md:z-auto md:w-52 md:translate-x-0 md:shadow-none",
-      mobileOpen ? "translate-x-0" : "-translate-x-full",
-    )}>
-      <button data-testid="mobile-nav-close" className="absolute right-2 top-3 rounded p-1 text-[var(--muted-foreground)] hover:bg-[var(--sidebar-accent)] md:hidden" onClick={onClose} aria-label="关闭导航">
+    <aside
+      className={cn(
+        "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar)] text-[var(--sidebar-foreground)] shadow-xl transition-transform md:relative md:z-auto md:w-52 md:translate-x-0 md:shadow-none",
+        mobileOpen ? "translate-x-0" : "-translate-x-full",
+      )}
+    >
+      <button
+        data-testid="mobile-nav-close"
+        className="absolute right-2 top-3 rounded p-1 text-[var(--muted-foreground)] hover:bg-[var(--sidebar-accent)] md:hidden"
+        onClick={onClose}
+        aria-label="关闭导航"
+      >
         <X className="h-4 w-4" />
       </button>
       {/* Header */}
       <div className="px-3 py-3 border-b border-[var(--sidebar-border)]">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-6 h-6 bg-[var(--sidebar-primary)] rounded-md flex items-center justify-center">
-            <span className="text-[var(--sidebar-primary-foreground)] text-[10px] font-bold">AI</span>
+            <span className="text-[var(--sidebar-primary-foreground)] text-[10px] font-bold">
+              AI
+            </span>
           </div>
           <span className="text-[13px] font-semibold">Data Analytics</span>
         </Link>
@@ -102,17 +121,19 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
               "w-full flex items-center gap-1.5 px-2 py-1.5 rounded-md text-[11px] transition-colors",
               connection
                 ? "bg-[var(--sidebar-accent)] hover:bg-[var(--sidebar-accent)]/80"
-                : "border border-dashed border-[var(--sidebar-border)] hover:border-[var(--muted-foreground)] text-[var(--muted-foreground)]"
+                : "border border-dashed border-[var(--sidebar-border)] hover:border-[var(--muted-foreground)] text-[var(--muted-foreground)]",
             )}
           >
             <Database className="w-3.5 h-3.5 opacity-50 shrink-0" />
             <span className="truncate flex-1 text-left">
               {connection ? connection.name : "选择连接"}
             </span>
-            <ChevronDown className={cn(
-              "w-3 h-3 opacity-50 shrink-0 transition-transform",
-              dropdownOpen && "rotate-180"
-            )} />
+            <ChevronDown
+              className={cn(
+                "w-3 h-3 opacity-50 shrink-0 transition-transform",
+                dropdownOpen && "rotate-180",
+              )}
+            />
           </button>
 
           {/* Dropdown */}
@@ -123,13 +144,15 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
                   加载中...
                 </div>
               ) : connectionError ? (
-                <button type="button" className="w-full px-3 py-2 text-left text-[10px] text-[var(--destructive)] hover:bg-[var(--accent)]" onClick={() => void loadConnections()}>
+                <button
+                  type="button"
+                  className="w-full px-3 py-2 text-left text-[10px] text-[var(--destructive)] hover:bg-[var(--accent)]"
+                  onClick={() => void loadConnections()}
+                >
                   连接加载失败，点击重试
                 </button>
               ) : connections.length === 0 ? (
-                <div className="px-3 py-2 text-[10px] text-[var(--muted-foreground)]">
-                  暂无连接
-                </div>
+                <div className="px-3 py-2 text-[10px] text-[var(--muted-foreground)]">暂无连接</div>
               ) : (
                 <div className="max-h-48 overflow-auto py-0.5">
                   {connections.map((conn) => (
@@ -140,13 +163,17 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
                         "w-full flex items-center gap-2 px-2.5 py-1.5 text-[11px] transition-colors text-left",
                         conn.id === connectionId
                           ? "bg-[var(--accent)] text-[var(--foreground)]"
-                          : "text-[var(--foreground)] hover:bg-[var(--accent)]"
+                          : "text-[var(--foreground)] hover:bg-[var(--accent)]",
                       )}
                     >
-                      <Circle className={cn(
-                        "w-1.5 h-1.5 shrink-0",
-                        conn.id === connectionId ? "fill-[var(--primary)]" : "fill-transparent stroke-[var(--muted-foreground)]"
-                      )} />
+                      <Circle
+                        className={cn(
+                          "w-1.5 h-1.5 shrink-0",
+                          conn.id === connectionId
+                            ? "fill-[var(--primary)]"
+                            : "fill-transparent stroke-[var(--muted-foreground)]",
+                        )}
+                      />
                       <div className="min-w-0 flex-1">
                         <div className="truncate font-medium">{conn.name}</div>
                         <div className="truncate text-[9px] text-[var(--muted-foreground)]">
@@ -202,7 +229,7 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
                 disabled && "pointer-events-none opacity-48",
                 active
                   ? "bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] font-medium"
-                  : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                  : "text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]",
               )}
             >
               <Icon className="w-4 h-4 opacity-60" />
@@ -214,7 +241,9 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
 
       {/* Footer */}
       <div className="px-3 py-2 border-t border-[var(--sidebar-border)]">
-        <span className="text-[10px] text-[var(--muted-foreground)]">v{process.env.NEXT_PUBLIC_APP_VERSION ?? ""}</span>
+        <span className="text-[10px] text-[var(--muted-foreground)]">
+          v{process.env.NEXT_PUBLIC_APP_VERSION ?? ""}
+        </span>
       </div>
     </aside>
   )

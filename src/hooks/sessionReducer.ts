@@ -17,7 +17,10 @@ export interface SessionReducerDeps {
 export function createInitialSession(overrides?: Partial<AnalysisSession>): AnalysisSession {
   const now = new Date()
   return {
-    id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `session-${Date.now()}`,
+    id:
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `session-${Date.now()}`,
     question: "",
     title: "",
     insight: "",
@@ -98,22 +101,41 @@ export function createSessionReducer(deps: SessionReducerDeps) {
       }
 
       case "COMPILE_START":
-        return touch({ ...state, status: "compiling", error: undefined, validationIssues: undefined })
+        return touch({
+          ...state,
+          status: "compiling",
+          error: undefined,
+          validationIssues: undefined,
+        })
 
       case "SET_COMPILED_SQL":
-        return touch({ ...state, compiledSql: action.compiledSql, status: "executing", error: undefined, validationIssues: undefined })
+        return touch({
+          ...state,
+          compiledSql: action.compiledSql,
+          status: "executing",
+          error: undefined,
+          validationIssues: undefined,
+        })
 
       case "COMPILE_ERROR":
         return touch({ ...state, status: "error", error: action.error, compiledSql: null })
 
       case "EXECUTE_START":
-        return touch({ ...state, status: "executing", error: undefined, validationIssues: undefined })
+        return touch({
+          ...state,
+          status: "executing",
+          error: undefined,
+          validationIssues: undefined,
+        })
 
       case "EXECUTE_SUCCESS": {
         // data-based 校验：确认结果列支持当前 displayConfig；issues 存进 state 供 SessionView 展示（错误不阻断渲染）
         let validationIssues: ValidationIssue[] | undefined
         if (schema) {
-          const result = validateDisplayConfig(state.displayConfig, { mode: "data", dataset: action.result })
+          const result = validateDisplayConfig(state.displayConfig, {
+            mode: "data",
+            dataset: action.result,
+          })
           if (result.issues.length > 0) validationIssues = result.issues
         }
         return touch({

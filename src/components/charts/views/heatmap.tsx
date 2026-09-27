@@ -26,7 +26,8 @@ export const HeatmapView = React.memo(function HeatmapView({
   const { matrix, xLabels, yLabels, truncated, min: minVal, max: maxVal, scale } = transformed
   if (matrix.length === 0) return <EmptyState />
 
-  const range = scale === "diverging" ? Math.max(Math.abs(minVal), Math.abs(maxVal)) || 1 : maxVal - minVal || 1
+  const range =
+    scale === "diverging" ? Math.max(Math.abs(minVal), Math.abs(maxVal)) || 1 : maxVal - minVal || 1
 
   const cellW = Math.max(40, Math.min(60, 600 / xLabels.length))
   const cellH = 32
@@ -35,11 +36,7 @@ export const HeatmapView = React.memo(function HeatmapView({
 
   return (
     <div>
-      {truncated && (
-        <ChartNotice>
-          数据已截断: 仅显示前 {MAX_HEATMAP_ENTRIES} 个唯一值
-        </ChartNotice>
-      )}
+      {truncated && <ChartNotice>数据已截断: 仅显示前 {MAX_HEATMAP_ENTRIES} 个唯一值</ChartNotice>}
       <div className="overflow-auto">
         <svg
           width={marginLeft + cellW * xLabels.length}
@@ -72,13 +69,20 @@ export const HeatmapView = React.memo(function HeatmapView({
               </text>
               {xLabels.map((_, col) => {
                 const val = matrix[row]?.[col] ?? null
-                const norm = val === null ? 0 : scale === "diverging" ? (val / range + 1) / 2 : (val - minVal) / range
-                const intensity = val === null ? 0 : scale === "diverging" ? Math.abs(val) / range : norm
-                const color = val === null
-                  ? "var(--chart-missing)"
-                  : scale === "diverging"
-                    ? `color-mix(in srgb, var(--chart-diverging-neutral) ${Math.round((1 - Math.abs(val) / range) * 100)}%, ${val < 0 ? "var(--chart-diverging-negative)" : "var(--chart-diverging-positive)"})`
-                    : `color-mix(in srgb, var(--chart-sequential-low) ${Math.round((1 - norm) * 100)}%, var(--chart-sequential-high))`
+                const norm =
+                  val === null
+                    ? 0
+                    : scale === "diverging"
+                      ? (val / range + 1) / 2
+                      : (val - minVal) / range
+                const intensity =
+                  val === null ? 0 : scale === "diverging" ? Math.abs(val) / range : norm
+                const color =
+                  val === null
+                    ? "var(--chart-missing)"
+                    : scale === "diverging"
+                      ? `color-mix(in srgb, var(--chart-diverging-neutral) ${Math.round((1 - Math.abs(val) / range) * 100)}%, ${val < 0 ? "var(--chart-diverging-negative)" : "var(--chart-diverging-positive)"})`
+                      : `color-mix(in srgb, var(--chart-sequential-low) ${Math.round((1 - norm) * 100)}%, var(--chart-sequential-high))`
                 return (
                   <g key={col}>
                     <title>{`${xLabels[col]} / ${y}: ${val === null ? "缺失" : val}`}</title>
@@ -95,7 +99,11 @@ export const HeatmapView = React.memo(function HeatmapView({
                       y={marginTop + row * cellH + cellH / 2 + 3}
                       textAnchor="middle"
                       fontSize={9}
-                      fill={intensity > 0.6 ? "var(--chart-cell-text-strong)" : "var(--chart-cell-text-muted)"}
+                      fill={
+                        intensity > 0.6
+                          ? "var(--chart-cell-text-strong)"
+                          : "var(--chart-cell-text-muted)"
+                      }
                     >
                       {val === null ? "缺失" : val.toFixed(0)}
                     </text>

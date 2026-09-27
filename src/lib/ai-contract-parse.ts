@@ -42,10 +42,33 @@ export function parseInsightItems(content: string): InsightItem[] {
     const context = parseContext(raw.context)
     const statTest = parseStatTest(raw.statTest)
     if (querySpec && displayConfig) {
-      items.push(buildQuerySpecItem({ title: raw.title, insight: raw.insight, rawSql, sqlValid, notices, context, statTest, querySpec, displayConfig }))
+      items.push(
+        buildQuerySpecItem({
+          title: raw.title,
+          insight: raw.insight,
+          rawSql,
+          sqlValid,
+          notices,
+          context,
+          statTest,
+          querySpec,
+          displayConfig,
+        }),
+      )
       continue
     }
-    items.push(buildFallbackItem(raw, { title: raw.title, insight: raw.insight, rawSql, sqlValid, notices, context, statTest, displayConfig }))
+    items.push(
+      buildFallbackItem(raw, {
+        title: raw.title,
+        insight: raw.insight,
+        rawSql,
+        sqlValid,
+        notices,
+        context,
+        statTest,
+        displayConfig,
+      }),
+    )
   }
   return items
 }
@@ -60,8 +83,11 @@ interface ParsedInsightParts {
   statTest: StatTestRequest | undefined
 }
 
-function buildQuerySpecItem(parts: ParsedInsightParts & { querySpec: QuerySpec; displayConfig: DisplayConfig }): InsightItem {
-  const { title, insight, rawSql, sqlValid, notices, context, statTest, querySpec, displayConfig } = parts
+function buildQuerySpecItem(
+  parts: ParsedInsightParts & { querySpec: QuerySpec; displayConfig: DisplayConfig },
+): InsightItem {
+  const { title, insight, rawSql, sqlValid, notices, context, statTest, querySpec, displayConfig } =
+    parts
   // 过渡期：AI 同时输出 sql 时一并透传，供旧客户端（InsightCard）展示
   return {
     title: title.slice(0, INSIGHT_FIELDS.title.maxLength),
@@ -78,7 +104,10 @@ function buildQuerySpecItem(parts: ParsedInsightParts & { querySpec: QuerySpec; 
   }
 }
 
-function buildFallbackItem(raw: Record<string, unknown>, parts: ParsedInsightParts & { displayConfig: DisplayConfig | null }): InsightItem {
+function buildFallbackItem(
+  raw: Record<string, unknown>,
+  parts: ParsedInsightParts & { displayConfig: DisplayConfig | null },
+): InsightItem {
   const { title, insight, rawSql, sqlValid, notices, context, statTest, displayConfig } = parts
   // 无 querySpec：靠 SQL 兜底；图表映射无效则回退表格——渲染失败不作为丢弃该项的理由
   let chart = parseChartMapping(raw.chart, rawSql) ?? (displayConfig ? displayConfig.mapping : null)
@@ -102,7 +131,13 @@ function buildFallbackItem(raw: Record<string, unknown>, parts: ParsedInsightPar
 }
 
 export function parseChartMapping(raw: unknown, sql: string): ChartMapping | null {
-  if (!isRecord(raw) || typeof raw.type !== "string" || !isChartType(raw.type) || !isRecord(raw.mapping)) return null
+  if (
+    !isRecord(raw) ||
+    typeof raw.type !== "string" ||
+    !isChartType(raw.type) ||
+    !isRecord(raw.mapping)
+  )
+    return null
   return parseMapping(raw.type, raw.mapping, extractOutputAliases(sql))
 }
 
@@ -130,21 +165,79 @@ function parseMapping(
   for (const [slot, value] of Object.entries(mapping)) {
     if (!validSlots.has(slot)) return null
     // 列槽位必须引用有效输出别名（querySpec 路径传 null 跳过别名校验）
-    if (COLUMN_SLOTS.has(slot) && (typeof value !== "string" || (aliases !== null && !aliases.has(value)))) return null
+    if (
+      COLUMN_SLOTS.has(slot) &&
+      (typeof value !== "string" || (aliases !== null && !aliases.has(value)))
+    )
+      return null
   }
 
   switch (chartType) {
-    case "table": return { chartType: "table" }
-    case "line": return { chartType: "line", x: stringValue(mapping.x), y: stringValue(mapping.y), color: optionalString(mapping.color) }
-    case "bar": return { chartType: "bar", x: stringValue(mapping.x), y: stringValue(mapping.y), fill: optionalString(mapping.fill), mode: isBarMode(mapping.mode) ? mapping.mode : "grouped" }
-    case "pie": return { chartType: "pie", name: stringValue(mapping.name), value: stringValue(mapping.value) }
-    case "scatter": return { chartType: "scatter", x: stringValue(mapping.x), y: stringValue(mapping.y), color: optionalString(mapping.color) }
-    case "boxplot": return { chartType: "boxplot", category: stringValue(mapping.category), value: stringValue(mapping.value) }
-    case "heatmap": return { chartType: "heatmap", x: stringValue(mapping.x), y: stringValue(mapping.y), value: stringValue(mapping.value) }
-    case "kpi": return { chartType: "kpi", value: stringValue(mapping.value), label: optionalString(mapping.label), comparison: optionalString(mapping.comparison) }
-    case "histogram": return { chartType: "histogram", value: stringValue(mapping.value), color: optionalString(mapping.color) }
+    case "table":
+      return { chartType: "table" }
+    case "line":
+      return {
+        chartType: "line",
+        x: stringValue(mapping.x),
+        y: stringValue(mapping.y),
+        color: optionalString(mapping.color),
+      }
+    case "bar":
+      return {
+        chartType: "bar",
+        x: stringValue(mapping.x),
+        y: stringValue(mapping.y),
+        fill: optionalString(mapping.fill),
+        mode: isBarMode(mapping.mode) ? mapping.mode : "grouped",
+      }
+    case "pie":
+      return {
+        chartType: "pie",
+        name: stringValue(mapping.name),
+        value: stringValue(mapping.value),
+      }
+    case "scatter":
+      return {
+        chartType: "scatter",
+        x: stringValue(mapping.x),
+        y: stringValue(mapping.y),
+        color: optionalString(mapping.color),
+      }
+    case "boxplot":
+      return {
+        chartType: "boxplot",
+        category: stringValue(mapping.category),
+        value: stringValue(mapping.value),
+      }
+    case "heatmap":
+      return {
+        chartType: "heatmap",
+        x: stringValue(mapping.x),
+        y: stringValue(mapping.y),
+        value: stringValue(mapping.value),
+      }
+    case "kpi":
+      return {
+        chartType: "kpi",
+        value: stringValue(mapping.value),
+        label: optionalString(mapping.label),
+        comparison: optionalString(mapping.comparison),
+      }
+    case "histogram":
+      return {
+        chartType: "histogram",
+        value: stringValue(mapping.value),
+        color: optionalString(mapping.color),
+      }
     case "correlation": {
-      const columns = Array.isArray(mapping.columns) ? mapping.columns.filter((value): value is string => typeof value === "string" && (aliases === null || aliases.has(value))).slice(0, LIMITS.correlationColumns) : undefined
+      const columns = Array.isArray(mapping.columns)
+        ? mapping.columns
+            .filter(
+              (value): value is string =>
+                typeof value === "string" && (aliases === null || aliases.has(value)),
+            )
+            .slice(0, LIMITS.correlationColumns)
+        : undefined
       const method = isCorrelationMethod(mapping.method) ? mapping.method : "pearson"
       return { chartType: "correlation", columns, method }
     }
@@ -157,7 +250,9 @@ function parseQuerySpec(raw: unknown): QuerySpec | null {
   const spec: QuerySpec = { table: raw.table.trim() }
 
   if (Array.isArray(raw.dimensions)) {
-    const dimensions = raw.dimensions.filter((d): d is string => typeof d === "string" && d.length > 0)
+    const dimensions = raw.dimensions.filter(
+      (d): d is string => typeof d === "string" && d.length > 0,
+    )
     if (dimensions.length > 0) spec.dimensions = dimensions
   }
   const measures = parseMeasureList(raw)
@@ -179,7 +274,13 @@ function parseQuerySpec(raw: unknown): QuerySpec | null {
 function parseMeasureList(raw: Record<string, unknown>): Measure[] {
   if (!Array.isArray(raw.measures)) return []
   return raw.measures
-    .filter((m): m is Record<string, unknown> => isRecord(m) && typeof m.field === "string" && typeof m.aggregation === "string" && MEASURE_AGGREGATIONS.has(m.aggregation))
+    .filter(
+      (m): m is Record<string, unknown> =>
+        isRecord(m) &&
+        typeof m.field === "string" &&
+        typeof m.aggregation === "string" &&
+        MEASURE_AGGREGATIONS.has(m.aggregation),
+    )
     .map((m) => ({
       field: m.field as string,
       aggregation: m.aggregation as Measure["aggregation"],
@@ -191,7 +292,13 @@ function parseMeasureList(raw: Record<string, unknown>): Measure[] {
 function parseFilterList(input: unknown): Filter[] {
   if (!Array.isArray(input)) return []
   return input
-    .filter((f): f is Record<string, unknown> => isRecord(f) && typeof f.field === "string" && typeof f.op === "string" && FILTER_OPERATORS.has(f.op))
+    .filter(
+      (f): f is Record<string, unknown> =>
+        isRecord(f) &&
+        typeof f.field === "string" &&
+        typeof f.op === "string" &&
+        FILTER_OPERATORS.has(f.op),
+    )
     .map((f) => ({
       field: f.field as string,
       op: f.op as Filter["op"],
@@ -203,7 +310,12 @@ function parseFilterList(input: unknown): Filter[] {
 function parseSortList(raw: Record<string, unknown>): SortSpec[] {
   if (!Array.isArray(raw.sort)) return []
   return raw.sort
-    .filter((s): s is Record<string, unknown> => isRecord(s) && typeof s.field === "string" && (s.direction === "asc" || s.direction === "desc"))
+    .filter(
+      (s): s is Record<string, unknown> =>
+        isRecord(s) &&
+        typeof s.field === "string" &&
+        (s.direction === "asc" || s.direction === "desc"),
+    )
     .map((s) => ({ field: s.field as string, direction: s.direction as SortSpec["direction"] }))
 }
 
@@ -252,7 +364,11 @@ function parseContext(raw: unknown): InsightContext[] | undefined {
       item.rule.trim() &&
       typeof item.applied === "boolean"
     ) {
-      contexts.push({ source: item.source.slice(0, LIMITS.contextSource), rule: item.rule.slice(0, LIMITS.contextRule), applied: item.applied })
+      contexts.push({
+        source: item.source.slice(0, LIMITS.contextSource),
+        rule: item.rule.slice(0, LIMITS.contextRule),
+        applied: item.applied,
+      })
     }
   }
   return contexts.length > 0 ? contexts : undefined
@@ -264,16 +380,31 @@ function parseStatTest(raw: unknown): StatTestRequest | undefined {
   const kind = raw.kind
   if (kind !== "ttest" && kind !== "cor" && kind !== "chisq") return undefined
   if (typeof raw.x !== "string" || !raw.x || typeof raw.y !== "string" || !raw.y) return undefined
-  const hypothesis = typeof raw.hypothesis === "string" && raw.hypothesis.trim() ? raw.hypothesis.slice(0, LIMITS.hypothesis) : ""
+  const hypothesis =
+    typeof raw.hypothesis === "string" && raw.hypothesis.trim()
+      ? raw.hypothesis.slice(0, LIMITS.hypothesis)
+      : ""
   return { kind, x: raw.x, y: raw.y, hypothesis }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
 }
-function isChartType(value: string): value is ChartType { return CHART_TYPES.includes(value as ChartType) }
-function isChartTypeValue(value: unknown): value is ChartType { return typeof value === "string" && isChartType(value) }
-function isCorrelationMethod(value: unknown): value is CorrelationMethod { return value === "pearson" || value === "spearman" || value === "kendall" }
-function isBarMode(value: unknown): value is "grouped" | "stacked" | "normalized" { return value === "grouped" || value === "stacked" || value === "normalized" }
-function stringValue(value: unknown): string { return typeof value === "string" ? value : "" }
-function optionalString(value: unknown): string | undefined { return typeof value === "string" && value ? value : undefined }
+function isChartType(value: string): value is ChartType {
+  return CHART_TYPES.includes(value as ChartType)
+}
+function isChartTypeValue(value: unknown): value is ChartType {
+  return typeof value === "string" && isChartType(value)
+}
+function isCorrelationMethod(value: unknown): value is CorrelationMethod {
+  return value === "pearson" || value === "spearman" || value === "kendall"
+}
+function isBarMode(value: unknown): value is "grouped" | "stacked" | "normalized" {
+  return value === "grouped" || value === "stacked" || value === "normalized"
+}
+function stringValue(value: unknown): string {
+  return typeof value === "string" ? value : ""
+}
+function optionalString(value: unknown): string | undefined {
+  return typeof value === "string" && value ? value : undefined
+}

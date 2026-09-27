@@ -22,13 +22,17 @@ async function render(mapping: ChartMapping, onChange: (mapping: ChartMapping) =
   document.body.appendChild(container)
   const root = createRoot(container)
   await act(async () => {
-    root.render(<ChartConfigPanel columns={columns} data={data} mapping={mapping} onChange={onChange} />)
+    root.render(
+      <ChartConfigPanel columns={columns} data={data} mapping={mapping} onChange={onChange} />,
+    )
   })
   return { container, root }
 }
 
 describe("ChartConfigPanel", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   afterEach(() => {
     document.body.replaceChildren()

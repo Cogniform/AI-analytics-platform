@@ -41,7 +41,15 @@ interface RWorkbenchProps {
 
 // 代码/输出分割：统一句柄 + 统一预设（src/lib/split.ts 的 SPLIT_PRESETS.rWorkbench）
 
-export function RWorkbench({ dataset, open, onClose, connectionId, sessionId, sourceSql, replayId }: RWorkbenchProps) {
+export function RWorkbench({
+  dataset,
+  open,
+  onClose,
+  connectionId,
+  sessionId,
+  sourceSql,
+  replayId,
+}: RWorkbenchProps) {
   const webR = useWebR()
   const [code, setCode] = useState("")
   const [injectedFor, setInjectedFor] = useState<SemanticDataset | null>(null)
@@ -60,7 +68,10 @@ export function RWorkbench({ dataset, open, onClose, connectionId, sessionId, so
 
   // 宽度以像素语义为准（420..1200px），换算成视口比例交给统一句柄
   const viewportWidth = typeof window === "undefined" ? 1440 : window.innerWidth
-  const widthBounds = { min: 420 / viewportWidth, max: Math.min(1200, viewportWidth) / viewportWidth }
+  const widthBounds = {
+    min: 420 / viewportWidth,
+    max: Math.min(1200, viewportWidth) / viewportWidth,
+  }
   const widthSplit = useSplitRatio(
     SPLIT_PRESETS.rWorkbenchWidth.key,
     Math.min(620, viewportWidth) / viewportWidth,
@@ -76,7 +87,16 @@ export function RWorkbench({ dataset, open, onClose, connectionId, sessionId, so
   }, [code])
 
   // actions 为稳定引用（useWebR useMemo）；effect 依赖它们不会因渲染变化重触发
-  const { init, ensurePackages, injectData, clearOutput, interrupt, execute, reportError, restoreOutput } = webR
+  const {
+    init,
+    ensurePackages,
+    injectData,
+    clearOutput,
+    interrupt,
+    execute,
+    reportError,
+    restoreOutput,
+  } = webR
 
   /** 统一执行入口（手动运行与历史回放共用）：超时输出 error 后尝试中断 */
   const runCode = useCallback(
@@ -102,7 +122,7 @@ export function RWorkbench({ dataset, open, onClose, connectionId, sessionId, so
       const template = generateRTemplate(dataset)
       const rHistory = connectionId ? await listRHistory(connectionId) : []
       if (cancelled) return
-      const replay = replayId ? rHistory.find((entry) => entry.id === replayId) ?? null : null
+      const replay = replayId ? (rHistory.find((entry) => entry.id === replayId) ?? null) : null
       // URL 带了回放 id、库里却没有这条记录（被清理/换连接）：明确提示，不退化成最近一条而不吭声
       const replayMissing = Boolean(replayId) && Boolean(connectionId) && !replay
       const history = replay ?? rHistory[0] ?? null
@@ -160,7 +180,19 @@ export function RWorkbench({ dataset, open, onClose, connectionId, sessionId, so
     return () => {
       cancelled = true
     }
-  }, [open, dataset, init, ensurePackages, injectData, reportError, restoreOutput, clearOutput, runCode, connectionId, replayId])
+  }, [
+    open,
+    dataset,
+    init,
+    ensurePackages,
+    injectData,
+    reportError,
+    restoreOutput,
+    clearOutput,
+    runCode,
+    connectionId,
+    replayId,
+  ])
 
   // 数据集变化且工作台已打开：重新注入（维护已打开状态下的数据新鲜度）
   useEffect(() => {
@@ -208,7 +240,8 @@ export function RWorkbench({ dataset, open, onClose, connectionId, sessionId, so
 
   // 每次执行完成（lastExecMs 变化）落一条 R 历史：文本输出可回放，图片不持久化（回放靠重跑重绘）
   useEffect(() => {
-    if (webR.lastExecMs === null || loggedExecRef.current === webR.lastExecMs || !connectionId) return
+    if (webR.lastExecMs === null || loggedExecRef.current === webR.lastExecMs || !connectionId)
+      return
     loggedExecRef.current = webR.lastExecMs
     const textItems = webR.output.filter((item) => typeof item.data === "string")
     // 只出图、没有文本的执行同样落库，否则纯绘图代码在历史里彻底消失
@@ -256,7 +289,11 @@ export function RWorkbench({ dataset, open, onClose, connectionId, sessionId, so
         label="调整 R 面板宽度（双击或 Home 复位）"
         className="absolute inset-y-0 left-0 z-10 -ml-1 hidden lg:flex"
       />
-      <RWorkbenchHeader rowCount={dataset.rows.length} colCount={dataset.columns.length} onClose={onClose} />
+      <RWorkbenchHeader
+        rowCount={dataset.rows.length}
+        colCount={dataset.columns.length}
+        onClose={onClose}
+      />
 
       <RWorkbenchToolbar
         busy={webR.busy || webR.injecting}

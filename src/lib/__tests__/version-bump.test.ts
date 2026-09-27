@@ -12,8 +12,15 @@ function runBump(argument: string, version = "1.25.3") {
   copyFileSync(packagePath, join(dir, "package.json"))
   const target = join(dir, "package.json")
   const original = readFileSync(target, "utf8")
-  writeFileSync(target, original.replace(/"version": "\d+\.\d+\.\d+"/, `"version": "${version}"`), "utf8")
-  const stdout = execFileSync(process.execPath, [scriptPath, argument], { cwd: dir, encoding: "utf8" })
+  writeFileSync(
+    target,
+    original.replace(/"version": "\d+\.\d+\.\d+"/, `"version": "${version}"`),
+    "utf8",
+  )
+  const stdout = execFileSync(process.execPath, [scriptPath, argument], {
+    cwd: dir,
+    encoding: "utf8",
+  })
   const updated = readFileSync(target, "utf8")
   return { stdout, version: JSON.parse(updated).version, updated }
 }

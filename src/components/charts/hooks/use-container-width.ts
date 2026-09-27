@@ -4,9 +4,7 @@ import { useState, useEffect } from "react"
  * Track container width via ResizeObserver.
  * Returns current width in pixels (default 500).
  */
-export function useContainerWidth(
-  ref: React.RefObject<HTMLDivElement | null>,
-) {
+export function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>) {
   const [width, setWidth] = useState(500)
 
   useEffect(() => {

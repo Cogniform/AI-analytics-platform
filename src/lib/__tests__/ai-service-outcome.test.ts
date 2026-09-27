@@ -10,7 +10,10 @@ const VALID_ITEMS = JSON.stringify({
     {
       title: "各区域销售额",
       insight: "华东最高",
-      querySpec: { table: "orders", measures: [{ field: "amount", aggregation: "sum", alias: "total" }] },
+      querySpec: {
+        table: "orders",
+        measures: [{ field: "amount", aggregation: "sum", alias: "total" }],
+      },
       displayConfig: { chartType: "kpi", mapping: { value: "total" } },
       context: [],
       statTest: null,
@@ -18,9 +21,15 @@ const VALID_ITEMS = JSON.stringify({
   ],
 })
 
-const TRUNCATED = '{\n  "items": [\n    {\n      "title": "月度趋势",\n      "insight": "按年月聚合",\n      "querySpec": {\n        "table": "fact_orders",\n        "measures": [\n          { "field": "pay_amount", "aggregatio'
+const TRUNCATED =
+  '{\n  "items": [\n    {\n      "title": "月度趋势",\n      "insight": "按年月聚合",\n      "querySpec": {\n        "table": "fact_orders",\n        "measures": [\n          { "field": "pay_amount", "aggregatio'
 
-const VALID_ITEM = { title: "t", insight: "i", chart: { chartType: "table" as const }, fallback: false }
+const VALID_ITEM = {
+  title: "t",
+  insight: "i",
+  chart: { chartType: "table" as const },
+  fallback: false,
+}
 
 function providerReturning(...completions: AICompletion[]): AICompletionProvider {
   let index = 0
@@ -46,7 +55,11 @@ describe("parseMaxTokens", () => {
 
 describe("describeOutcome", () => {
   it("有可用条目即 ok，且不产生用户提示", () => {
-    const outcome = describeOutcome({ content: VALID_ITEMS, finishReason: "stop", items: [VALID_ITEM] })
+    const outcome = describeOutcome({
+      content: VALID_ITEMS,
+      finishReason: "stop",
+      items: [VALID_ITEM],
+    })
 
     expect(outcome.reason).toBe("ok")
     expect(outcome.message).toBe("")
@@ -61,7 +74,11 @@ describe("describeOutcome", () => {
     expect(truncated.reason).toBe("truncated")
     expect(truncated.message).toContain("拆小")
 
-    const invalid = describeOutcome({ content: "这是解释性文字，不是 JSON", finishReason: "stop", items: [] })
+    const invalid = describeOutcome({
+      content: "这是解释性文字，不是 JSON",
+      finishReason: "stop",
+      items: [],
+    })
     expect(invalid.reason).toBe("invalid_json")
 
     const noItem = describeOutcome({ content: '{"items":[]}', finishReason: "stop", items: [] })
@@ -99,7 +116,12 @@ describe("generateAnalysis 有界修复", () => {
     )
     const complete = vi.spyOn(provider, "complete")
 
-    const result = await generateAnalysis("按区域统计", "TABLE orders(amount numeric)", [], provider)
+    const result = await generateAnalysis(
+      "按区域统计",
+      "TABLE orders(amount numeric)",
+      [],
+      provider,
+    )
 
     expect(result.items).toHaveLength(1)
     expect(result.attempts).toBe(2)
@@ -114,7 +136,12 @@ describe("generateAnalysis 有界修复", () => {
     )
     const complete = vi.spyOn(provider, "complete")
 
-    const result = await generateAnalysis("按区域统计", "TABLE orders(amount numeric)", [], provider)
+    const result = await generateAnalysis(
+      "按区域统计",
+      "TABLE orders(amount numeric)",
+      [],
+      provider,
+    )
 
     expect(complete).toHaveBeenCalledTimes(2)
     expect(result.items).toEqual([])

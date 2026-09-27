@@ -25,7 +25,14 @@ interface SqlEditorPanelProps {
   onRun: () => void
 }
 
-export function SqlEditorPanel({ connectionId, sqlDraft, onDraftChange, compiledSql, busy, onRun }: SqlEditorPanelProps) {
+export function SqlEditorPanel({
+  connectionId,
+  sqlDraft,
+  onDraftChange,
+  compiledSql,
+  busy,
+  onRun,
+}: SqlEditorPanelProps) {
   const [monacoReady, setMonacoReady] = useState(false)
 
   // 配置本地 monaco（幂等；客户端首帧后异步完成，避免 loader.init 回退 CDN）
@@ -46,7 +53,13 @@ export function SqlEditorPanel({ connectionId, sqlDraft, onDraftChange, compiled
         <span className="text-xs font-medium text-[var(--muted-foreground)]">SQL 编辑器</span>
         <div className="flex items-center gap-1.5">
           <SaveQueryControl connectionId={connectionId} sql={compiledSql} />
-          <Button size="sm" onClick={onRun} disabled={busy || !sqlDraft.trim()} aria-busy={busy} className="gap-1 h-7 text-xs">
+          <Button
+            size="sm"
+            onClick={onRun}
+            disabled={busy || !sqlDraft.trim()}
+            aria-busy={busy}
+            className="gap-1 h-7 text-xs"
+          >
             {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
             {busy ? "执行中" : "执行"}
           </Button>

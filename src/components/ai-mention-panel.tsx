@@ -14,7 +14,14 @@ interface AiMentionPanelProps {
 }
 
 /** @ 提及下拉面板：键盘高亮 + 鼠标悬停/点选（listbox/option 语义）。 */
-export function AiMentionPanel({ tables, activeIndex, onSelect, onHoverIndex, panelRef, id }: AiMentionPanelProps) {
+export function AiMentionPanel({
+  tables,
+  activeIndex,
+  onSelect,
+  onHoverIndex,
+  panelRef,
+  id,
+}: AiMentionPanelProps) {
   if (tables.length === 0) return null
 
   return (
@@ -42,7 +49,9 @@ export function AiMentionPanel({ tables, activeIndex, onSelect, onHoverIndex, pa
         >
           <Table className="w-3 h-3 shrink-0 text-[var(--muted-foreground)]" />
           <span className="font-mono truncate">{t.name}</span>
-          <span className="ml-auto text-[9px] text-[var(--muted-foreground)] shrink-0">{t.columns.length} 列</span>
+          <span className="ml-auto text-[9px] text-[var(--muted-foreground)] shrink-0">
+            {t.columns.length} 列
+          </span>
         </button>
       ))}
     </div>

@@ -1,6 +1,11 @@
 import OpenAI from "openai"
 import { AI_RESPONSE_JSON_SCHEMA } from "./ai-contract"
-import { AI_CONFIG, AIConfigurationError, resolveRequestHeaders, type ResponseFormatMode } from "./ai-config"
+import {
+  AI_CONFIG,
+  AIConfigurationError,
+  resolveRequestHeaders,
+  type ResponseFormatMode,
+} from "./ai-config"
 
 /** 提供方是否明确拒绝当前 response_format（可降级的判定） */
 export function isResponseFormatUnsupported(error: unknown): boolean {
@@ -49,7 +54,10 @@ export function describeAIError(error: unknown): string {
   const providerMessage =
     typeof body === "string"
       ? body
-      : body && typeof body === "object" && "message" in body && typeof (body as { message?: unknown }).message === "string"
+      : body &&
+          typeof body === "object" &&
+          "message" in body &&
+          typeof (body as { message?: unknown }).message === "string"
         ? (body as { message: string }).message
         : ""
   parts.push(providerMessage || detail.message)
@@ -69,7 +77,8 @@ function mapUsage(usage: unknown): AIUsage | undefined {
     total_tokens?: unknown
     completion_tokens_details?: { reasoning_tokens?: unknown }
   }
-  const toNumber = (value: unknown): number | undefined => (typeof value === "number" ? value : undefined)
+  const toNumber = (value: unknown): number | undefined =>
+    typeof value === "number" ? value : undefined
   return {
     promptTokens: toNumber(raw.prompt_tokens),
     completionTokens: toNumber(raw.completion_tokens),
@@ -80,7 +89,9 @@ function mapUsage(usage: unknown): AIUsage | undefined {
 
 export function getDefaultProvider(): AICompletionProvider {
   if (!AI_CONFIG.apiBase) {
-    throw new AIConfigurationError("AI 服务未配置：缺少 API Base。请在 .env 文件中设置 AI_API_BASE。")
+    throw new AIConfigurationError(
+      "AI 服务未配置：缺少 API Base。请在 .env 文件中设置 AI_API_BASE。",
+    )
   }
   if (!AI_CONFIG.apiKey) {
     throw new AIConfigurationError("AI 服务未配置：缺少 API Key。请在 .env 文件中设置 AI_API_KEY。")
@@ -113,7 +124,9 @@ function createOpenAIProvider(): AICompletionProvider {
           lastError = error
           const next = chain[index + 1]
           if (!next || !isResponseFormatUnsupported(error)) throw error
-          console.warn(`[ai] response_format=${mode} 被提供方拒绝，降级为 ${next}：${describeAIError(error)}`)
+          console.warn(
+            `[ai] response_format=${mode} 被提供方拒绝，降级为 ${next}：${describeAIError(error)}`,
+          )
         }
       }
       throw lastError

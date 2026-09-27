@@ -18,7 +18,13 @@ interface Props {
   className?: string
 }
 
-export function DropdownSelect({ value, options, placeholder = "请选择", onChange, className }: Props) {
+export function DropdownSelect({
+  value,
+  options,
+  placeholder = "请选择",
+  onChange,
+  className,
+}: Props) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -45,7 +51,12 @@ export function DropdownSelect({ value, options, placeholder = "请选择", onCh
         <span className={cn("truncate", !selected && "text-[var(--muted-foreground)]")}>
           {selected ? selected.label : placeholder}
         </span>
-        <ChevronDown className={cn("w-3.5 h-3.5 text-[var(--muted-foreground)] shrink-0 transition-transform", open && "rotate-180")} />
+        <ChevronDown
+          className={cn(
+            "w-3.5 h-3.5 text-[var(--muted-foreground)] shrink-0 transition-transform",
+            open && "rotate-180",
+          )}
+        />
       </button>
 
       {/* Dropdown */}
@@ -60,7 +71,7 @@ export function DropdownSelect({ value, options, placeholder = "请选择", onCh
                 type="button"
                 className={cn(
                   "w-full flex items-center justify-between px-2.5 py-1.5 text-xs text-left hover:bg-[var(--accent)] transition-colors",
-                  opt.value === value && "bg-[var(--accent)]"
+                  opt.value === value && "bg-[var(--accent)]",
                 )}
                 onClick={() => {
                   onChange(opt.value)
@@ -69,9 +80,13 @@ export function DropdownSelect({ value, options, placeholder = "请选择", onCh
               >
                 <div className="min-w-0">
                   <span className="truncate">{opt.label}</span>
-                  {opt.extra && <span className="text-[var(--muted-foreground)] ml-1.5">{opt.extra}</span>}
+                  {opt.extra && (
+                    <span className="text-[var(--muted-foreground)] ml-1.5">{opt.extra}</span>
+                  )}
                 </div>
-                {opt.value === value && <Check className="w-3 h-3 text-[var(--foreground)] shrink-0" />}
+                {opt.value === value && (
+                  <Check className="w-3 h-3 text-[var(--foreground)] shrink-0" />
+                )}
               </button>
             ))
           )}

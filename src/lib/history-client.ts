@@ -27,12 +27,17 @@ export function toPersistedOutput(items: { type: string; data: string }[]): stri
 }
 
 /** 读取历史（新的在前）；服务不可用时返回空数组（时间线只显示 SQL 历史） */
-export async function listHistory(connectionId: string, kind?: HistoryKind): Promise<HistoryEntry[]> {
+export async function listHistory(
+  connectionId: string,
+  kind?: HistoryKind,
+): Promise<HistoryEntry[]> {
   if (!connectionId) return []
   const params = new URLSearchParams({ connectionId })
   if (kind) params.set("kind", kind)
   try {
-    const response = await fetchApi<ApiResponse<HistoryEntry[]>>(`/api/history?${params.toString()}`)
+    const response = await fetchApi<ApiResponse<HistoryEntry[]>>(
+      `/api/history?${params.toString()}`,
+    )
     return response.success ? response.data : []
   } catch (error) {
     console.warn("读取历史记录失败", error instanceof Error ? error.message : error)
@@ -142,7 +147,15 @@ function isLegacyEntry(value: unknown): value is HistoryEntry {
   const entry = value as Partial<HistoryEntry> & { kind?: unknown }
   if (typeof entry.connectionId !== "string" || typeof entry.sessionId !== "string") return false
   if (typeof entry.createdAt !== "string" || typeof entry.id !== "string") return false
-  if (entry.kind === "ai") return typeof (entry as { question?: unknown }).question === "string" && Array.isArray((entry as { items?: unknown }).items)
-  if (entry.kind === "r") return typeof (entry as { code?: unknown }).code === "string" && Array.isArray((entry as { output?: unknown }).output)
+  if (entry.kind === "ai")
+    return (
+      typeof (entry as { question?: unknown }).question === "string" &&
+      Array.isArray((entry as { items?: unknown }).items)
+    )
+  if (entry.kind === "r")
+    return (
+      typeof (entry as { code?: unknown }).code === "string" &&
+      Array.isArray((entry as { output?: unknown }).output)
+    )
   return false
 }

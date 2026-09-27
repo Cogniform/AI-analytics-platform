@@ -35,7 +35,7 @@ export function RWorkbenchStatusBar({
       </span>
       <span className="ml-auto flex items-center gap-3">
         {injecting && <span>正在注入当前结果集为 df…（首次加载 R 运行时约 8MB）</span>}
-        {lastExecMs !== null && <span>上次执行 {((lastExecMs / 1000).toFixed(2))}s</span>}
+        {lastExecMs !== null && <span>上次执行 {(lastExecMs / 1000).toFixed(2)}s</span>}
       </span>
     </footer>
   )

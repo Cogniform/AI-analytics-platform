@@ -17,14 +17,24 @@ function dataset(): SemanticDataset {
   }
 }
 
-const QUERY_SPEC: QuerySpec = { table: "orders", measures: [{ field: "amount", aggregation: "sum", alias: "total" }] }
+const QUERY_SPEC: QuerySpec = {
+  table: "orders",
+  measures: [{ field: "amount", aggregation: "sum", alias: "total" }],
+}
 const DISPLAY_CONFIG: DisplayConfig = { chartType: "table", mapping: { chartType: "table" } }
 
 function renderSession() {
   const executeCompiled = vi.fn(async () => dataset())
-  const captured: { session: AnalysisSession | null; dispatch: SessionDispatch | null } = { session: null, dispatch: null }
+  const captured: { session: AnalysisSession | null; dispatch: SessionDispatch | null } = {
+    session: null,
+    dispatch: null,
+  }
   function Probe() {
-    const { session, dispatch } = useSession({ connectionId: "conn-1", schema: null, executeCompiled })
+    const { session, dispatch } = useSession({
+      connectionId: "conn-1",
+      schema: null,
+      executeCompiled,
+    })
     captured.session = session
     captured.dispatch = dispatch
     return null
@@ -42,7 +52,13 @@ async function runInsight(captured: { dispatch: SessionDispatch | null }, questi
   await act(async () => {
     captured.dispatch?.({
       type: "INIT_FROM_AI",
-      payload: { question, title: "各区域销售额", insight: "华东最高", querySpec: QUERY_SPEC, displayConfig: DISPLAY_CONFIG },
+      payload: {
+        question,
+        title: "各区域销售额",
+        insight: "华东最高",
+        querySpec: QUERY_SPEC,
+        displayConfig: DISPLAY_CONFIG,
+      },
     })
   })
   // 冲刷编译 effect → 执行 promise → EXECUTE_SUCCESS
@@ -52,7 +68,9 @@ async function runInsight(captured: { dispatch: SessionDispatch | null }, questi
 }
 
 describe("useSession 执行契约", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   afterEach(() => {
     document.body.replaceChildren()

@@ -10,7 +10,13 @@ export class ApiRequestError extends Error {
   readonly retryable: boolean
   readonly requestId?: string | undefined
 
-  constructor(message: string, code: string, retryable: boolean, status?: number, requestId?: string) {
+  constructor(
+    message: string,
+    code: string,
+    retryable: boolean,
+    status?: number,
+    requestId?: string,
+  ) {
     super(message)
     this.name = "ApiRequestError"
     this.code = code
@@ -20,7 +26,11 @@ export class ApiRequestError extends Error {
   }
 }
 
-export async function fetchApi<T = unknown>(input: RequestInfo | URL, init: RequestInit = {}, timeoutMs = 30000): Promise<T> {
+export async function fetchApi<T = unknown>(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  timeoutMs = 30000,
+): Promise<T> {
   if (init.signal?.aborted) throw new DOMException("请求已取消", "AbortError")
   const controller = new AbortController()
   let timedOut = false
@@ -45,7 +55,12 @@ export async function fetchApi<T = unknown>(input: RequestInfo | URL, init: Requ
       )
     }
     if (payload === null) {
-      throw new ApiRequestError("服务返回了无法解析的响应", "INVALID_RESPONSE", true, response.status)
+      throw new ApiRequestError(
+        "服务返回了无法解析的响应",
+        "INVALID_RESPONSE",
+        true,
+        response.status,
+      )
     }
     return payload as T
   } catch (error) {
@@ -72,6 +87,11 @@ function asErrorEnvelope(value: unknown): ErrorEnvelope | null {
   const candidate = value as Partial<ErrorEnvelope>
   const error = candidate.error
   if (candidate.success !== false || !error || typeof error !== "object") return null
-  if (typeof error.code !== "string" || typeof error.message !== "string" || typeof error.retryable !== "boolean") return null
+  if (
+    typeof error.code !== "string" ||
+    typeof error.message !== "string" ||
+    typeof error.retryable !== "boolean"
+  )
+    return null
   return candidate as ErrorEnvelope
 }

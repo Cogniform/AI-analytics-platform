@@ -83,7 +83,11 @@ describe("compileQuerySpec", () => {
     const { sql, params } = compileQuerySpec({
       table: "orders",
       joins: [
-        { table: "customers", type: "left", on: { left: "orders.customer_id", right: "customers.id" } },
+        {
+          table: "customers",
+          type: "left",
+          on: { left: "orders.customer_id", right: "customers.id" },
+        },
       ],
       dimensions: ["customer_name"],
       measures: [{ field: "amount", aggregation: "sum", alias: "total" }],
@@ -105,11 +109,13 @@ describe("compileQuerySpec", () => {
       ],
       measures: [{ field: "amount", aggregation: "sum" }],
     })
-    expect(sql).toContain("date_trunc('month', \"created_at\") AS \"expr_0\"")
-    expect(sql).toContain("extract(year from \"created_at\") AS \"expr_1\"")
+    expect(sql).toContain('date_trunc(\'month\', "created_at") AS "expr_0"')
+    expect(sql).toContain('extract(year from "created_at") AS "expr_1"')
     // 标识符项 → 列引用；其余 → 字符串字面量
     expect(sql).toContain("concat(\"customer_name\", ' (', '合计', ')') AS \"expr_2\"")
-    expect(sql).toContain('GROUP BY date_trunc(\'month\', "created_at"), extract(year from "created_at"), concat("customer_name", \' (\', \'合计\', \')\')')
+    expect(sql).toContain(
+      "GROUP BY date_trunc('month', \"created_at\"), extract(year from \"created_at\"), concat(\"customer_name\", ' (', '合计', ')')",
+    )
   })
 
   it("支持 sort 与 limit（数字安全拼接）", () => {
@@ -124,17 +130,14 @@ describe("compileQuerySpec", () => {
   })
 
   it("schema 校验：表不存在时抛出错误", () => {
-    expect(() =>
-      compileQuerySpec({ table: "nope", dimensions: ["id"] }, schema),
-    ).toThrow(/表不存在/)
+    expect(() => compileQuerySpec({ table: "nope", dimensions: ["id"] }, schema)).toThrow(
+      /表不存在/,
+    )
   })
 
   it("schema 校验：列不存在时抛出错误", () => {
     expect(() =>
-      compileQuerySpec(
-        { table: "orders", dimensions: ["missing_col"] },
-        schema,
-      ),
+      compileQuerySpec({ table: "orders", dimensions: ["missing_col"] }, schema),
     ).toThrow(/列不存在/)
   })
 
@@ -148,7 +151,9 @@ describe("compileQuerySpec", () => {
         table: "orders",
         dimensions: ["category_l1"],
         measures: [{ field: "amount", aggregation: "sum", alias: "销售额" }],
-        joins: [{ table: "products", type: "inner", on: { left: "product_id", right: "product_id" } }],
+        joins: [
+          { table: "products", type: "inner", on: { left: "product_id", right: "product_id" } },
+        ],
       },
       schema,
     )
@@ -163,7 +168,9 @@ describe("compileQuerySpec", () => {
         {
           table: "orders",
           dimensions: ["products.category_l1"],
-          joins: [{ table: "products", type: "inner", on: { left: "product_id", right: "product_id" } }],
+          joins: [
+            { table: "products", type: "inner", on: { left: "product_id", right: "product_id" } },
+          ],
         },
         schema,
       ),
@@ -171,12 +178,14 @@ describe("compileQuerySpec", () => {
   })
 
   it("schema 校验：未 JOIN 的表列不可引用", () => {
-    expect(() => compileQuerySpec({ table: "orders", dimensions: ["category_l1"] }, schema)).toThrow(/列不存在/)
+    expect(() =>
+      compileQuerySpec({ table: "orders", dimensions: ["category_l1"] }, schema),
+    ).toThrow(/列不存在/)
   })
 
   it("非法的 limit 抛出错误", () => {
-    expect(() =>
-      compileQuerySpec({ table: "orders", dimensions: ["id"], limit: -1 }),
-    ).toThrow(/非法的 limit/)
+    expect(() => compileQuerySpec({ table: "orders", dimensions: ["id"], limit: -1 })).toThrow(
+      /非法的 limit/,
+    )
   })
 })

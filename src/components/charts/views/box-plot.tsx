@@ -7,11 +7,7 @@ import { computeBoxStats } from "../algorithms"
 import { EmptyState } from "../empty-state"
 import type { XYChartProps } from "../types"
 
-export const BoxPlotView = React.memo(function BoxPlotView({
-  data,
-  xKey,
-  yKey,
-}: XYChartProps) {
+export const BoxPlotView = React.memo(function BoxPlotView({ data, xKey, yKey }: XYChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const width = useContainerWidth(containerRef)
 
@@ -47,11 +43,7 @@ export const BoxPlotView = React.memo(function BoxPlotView({
   const yPad = (globalMax - globalMin) * 0.1 || 1
 
   const yScale = (v: number) => {
-    return (
-      plotH -
-      ((v - (globalMin - yPad)) / ((globalMax + yPad) - (globalMin - yPad))) *
-        plotH
-    )
+    return plotH - ((v - (globalMin - yPad)) / (globalMax + yPad - (globalMin - yPad))) * plotH
   }
 
   const plotW = width - margin.left - margin.right
@@ -59,10 +51,8 @@ export const BoxPlotView = React.memo(function BoxPlotView({
   const boxWidth = Math.min(groupWidth * 0.6, 60)
 
   const tickCount = 6
-  const tickStep = ((globalMax + yPad) - (globalMin - yPad)) / tickCount
-  const yTicks = Array.from({ length: tickCount + 1 }, (_, i) =>
-    globalMin - yPad + i * tickStep,
-  )
+  const tickStep = (globalMax + yPad - (globalMin - yPad)) / tickCount
+  const yTicks = Array.from({ length: tickCount + 1 }, (_, i) => globalMin - yPad + i * tickStep)
 
   return (
     <div ref={containerRef} className="w-full">

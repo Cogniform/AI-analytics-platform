@@ -160,7 +160,11 @@ export class WebRClient {
       this.patch({
         output: [
           ...this.state.output,
-          { id: this.nextOutputId(), type: "error", data: "R 环境未就绪（初始化失败）。请检查网络后刷新页面重试" },
+          {
+            id: this.nextOutputId(),
+            type: "error",
+            data: "R 环境未就绪（初始化失败）。请检查网络后刷新页面重试",
+          },
         ],
       })
       return
@@ -179,12 +183,17 @@ export class WebRClient {
       })
       const mapped: ROutputItem[] = []
       for (const o of capture.output) {
-        mapped.push({ id: this.nextOutputId(), type: String(o.type), data: await safeOutputData(o.data) })
+        mapped.push({
+          id: this.nextOutputId(),
+          type: String(o.type),
+          data: await safeOutputData(o.data),
+        })
       }
       this.patch({ output: [...this.state.output, ...mapped] })
       // 图片累积展示（一次会话可出多张图），但"本次执行出了几张"单独记，历史条目用得上
       this.patch({
-        images: capture.images.length > 0 ? [...this.state.images, ...capture.images] : this.state.images,
+        images:
+          capture.images.length > 0 ? [...this.state.images, ...capture.images] : this.state.images,
         lastImageCount: capture.images.length,
       })
     } catch (e) {
@@ -217,7 +226,10 @@ export class WebRClient {
     this.patch({ injecting: true })
     const injection = this.instance.webR.evalR(buildDataFrameCode(ds))
     // 失败不阻断后续执行：执行路径只等它结束，错误由调用方（工作台）呈现
-    this.pendingInjection = injection.then(() => undefined, () => undefined)
+    this.pendingInjection = injection.then(
+      () => undefined,
+      () => undefined,
+    )
     try {
       await injection
     } finally {
@@ -234,13 +246,18 @@ export class WebRClient {
   restoreOutput(lines: string[]): void {
     if (lines.length === 0) return
     this.patch({
-      output: [...this.state.output, ...lines.map((data) => ({ id: this.nextOutputId(), type: "stdout", data }))],
+      output: [
+        ...this.state.output,
+        ...lines.map((data) => ({ id: this.nextOutputId(), type: "stdout", data })),
+      ],
     })
   }
 
   /** 输出一条错误项（供 UI 在初始化失败等场景提示；execute 未初始化路径亦走 error 项） */
   reportError(message: string) {
-    this.patch({ output: [...this.state.output, { id: this.nextOutputId(), type: "error", data: message }] })
+    this.patch({
+      output: [...this.state.output, { id: this.nextOutputId(), type: "error", data: message }],
+    })
   }
 
   /**
@@ -271,7 +288,15 @@ export class WebRClient {
     this.instance = null
     this.installed.clear()
     this.state.images.forEach((img) => img.close())
-    this.patch({ status: "idle", packages: [], output: [], images: [], error: undefined, lastExecMs: null, lastImageCount: 0 })
+    this.patch({
+      status: "idle",
+      packages: [],
+      output: [],
+      images: [],
+      error: undefined,
+      lastExecMs: null,
+      lastImageCount: 0,
+    })
   }
 
   /** 数据集是否超过注入阈值（导出给工具/测试） */
@@ -285,7 +310,7 @@ export function withTimeout<T>(promise: Promise<T>, timeoutMs = DEFAULT_TIMEOUT_
   return Promise.race([
     promise,
     new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`执行超时（>${timeoutMs / 1000}s）`)), timeoutMs)
+      setTimeout(() => reject(new Error(`执行超时（>${timeoutMs / 1000}s）`)), timeoutMs),
     ),
   ])
 }

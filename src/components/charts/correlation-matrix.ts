@@ -24,20 +24,22 @@ export function computeCorrelationMatrix(
   method: CorrelationMethod,
 ): CorrelationMatrixResult {
   const labels = requestedColumns.slice(0, MAX_CORR_COLUMNS)
-  const cells = labels.map((left) => labels.map((right) => {
-    const leftValues: number[] = []
-    const rightValues: number[] = []
+  const cells = labels.map((left) =>
+    labels.map((right) => {
+      const leftValues: number[] = []
+      const rightValues: number[] = []
 
-    for (const row of rows) {
-      const leftValue = toFiniteNumber(row[left])
-      const rightValue = toFiniteNumber(row[right])
-      if (leftValue === null || rightValue === null) continue
-      leftValues.push(leftValue)
-      rightValues.push(rightValue)
-    }
+      for (const row of rows) {
+        const leftValue = toFiniteNumber(row[left])
+        const rightValue = toFiniteNumber(row[right])
+        if (leftValue === null || rightValue === null) continue
+        leftValues.push(leftValue)
+        rightValues.push(rightValue)
+      }
 
-    return computeCorrelation(leftValues, rightValues, method)
-  }))
+      return computeCorrelation(leftValues, rightValues, method)
+    }),
+  )
 
   return {
     labels,

@@ -56,7 +56,10 @@ describe("replaceMention", () => {
 
 describe("extractMentions", () => {
   it("extracts all @mentions deduplicated", () => {
-    expect(extractMentions("对比 @orders 与 @customers，再看 @orders")).toEqual(["orders", "customers"])
+    expect(extractMentions("对比 @orders 与 @customers，再看 @orders")).toEqual([
+      "orders",
+      "customers",
+    ])
   })
 
   it("returns empty array without mentions", () => {

@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import {
-  computeBoxStats,
-  computeCorrelation,
-  computeHistogram,
-  quantileType7,
-} from "../algorithms"
+import { computeBoxStats, computeCorrelation, computeHistogram, quantileType7 } from "../algorithms"
 
 describe("chart statistics", () => {
   it("uses Hyndman-Fan type 7 quantiles", () => {
@@ -24,7 +19,10 @@ describe("chart statistics", () => {
 
   it("reports correlations as unavailable for constant or insufficient data", () => {
     expect(computeCorrelation([1], [2], "pearson")).toEqual({ value: null, sampleSize: 1 })
-    expect(computeCorrelation([1, 1, 1], [1, 2, 3], "pearson")).toEqual({ value: null, sampleSize: 3 })
+    expect(computeCorrelation([1, 1, 1], [1, 2, 3], "pearson")).toEqual({
+      value: null,
+      sampleSize: 3,
+    })
   })
 
   it("handles ranks and ties for Spearman and Kendall tau-b", () => {

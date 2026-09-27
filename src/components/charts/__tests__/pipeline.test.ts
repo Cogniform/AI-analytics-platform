@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import { createMappingForChart, profileData, recommendCharts, validateChartMapping } from "../pipeline"
+import {
+  createMappingForChart,
+  profileData,
+  recommendCharts,
+  validateChartMapping,
+} from "../pipeline"
 
 const columns = [
   { name: "day", type: "date" },
@@ -36,9 +41,22 @@ describe("chart pipeline", () => {
 
   it("creates legal defaults only after the user selects a chart type", () => {
     const profile = profileData(columns, rows)
-    expect(createMappingForChart("pie", profile)).toEqual({ chartType: "pie", name: "region", value: "sales" })
-    expect(createMappingForChart("heatmap", profile)).toEqual({ chartType: "heatmap", x: "region", y: "day", value: "sales" })
-    expect(createMappingForChart("correlation", profile)).toEqual({ chartType: "correlation", columns: ["sales"], method: "pearson" })
+    expect(createMappingForChart("pie", profile)).toEqual({
+      chartType: "pie",
+      name: "region",
+      value: "sales",
+    })
+    expect(createMappingForChart("heatmap", profile)).toEqual({
+      chartType: "heatmap",
+      x: "region",
+      y: "day",
+      value: "sales",
+    })
+    expect(createMappingForChart("correlation", profile)).toEqual({
+      chartType: "correlation",
+      columns: ["sales"],
+      method: "pearson",
+    })
   })
 
   it("rejects duplicate line coordinates instead of overwriting them", () => {

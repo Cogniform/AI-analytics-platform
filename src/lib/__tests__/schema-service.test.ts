@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { buildSchemaContext, scanSchema, type ColumnInfo, type DatabaseSchema, type RelationInfo, type TableInfo } from "../schema-service"
+import {
+  buildSchemaContext,
+  scanSchema,
+  type ColumnInfo,
+  type DatabaseSchema,
+  type RelationInfo,
+  type TableInfo,
+} from "../schema-service"
 import {
   buildDataProfileText,
   type ColumnDataProfile,
@@ -7,9 +14,14 @@ import {
 } from "../data-profile-service"
 
 const stub = vi.hoisted(() => ({
-  connection: null as
-    | { host: string; port: number; database: string; username: string; passwordEncrypted: string; ssl: boolean }
-    | null,
+  connection: null as {
+    host: string
+    port: number
+    database: string
+    username: string
+    passwordEncrypted: string
+    ssl: boolean
+  } | null,
   configs: [] as Record<string, unknown>[],
   calls: [] as { sql: string; params: unknown[] | undefined }[],
   rows: new Map<string, unknown[]>(),
@@ -87,7 +99,9 @@ const schema = (tables: TableInfo[], relations: RelationInfo[] = []): DatabaseSc
   relations,
 })
 
-const profileColumn = (over: Partial<ColumnDataProfile> & { name: string; type: string }): ColumnDataProfile => ({
+const profileColumn = (
+  over: Partial<ColumnDataProfile> & { name: string; type: string },
+): ColumnDataProfile => ({
   distinctCount: 0,
   nullCount: 0,
   min: null,
@@ -96,7 +110,11 @@ const profileColumn = (over: Partial<ColumnDataProfile> & { name: string; type: 
   ...over,
 })
 
-const profile = (table: string, rowCount: number, columns: ColumnDataProfile[]): TableDataProfile => ({
+const profile = (
+  table: string,
+  rowCount: number,
+  columns: ColumnDataProfile[],
+): TableDataProfile => ({
   table,
   rowCount,
   columns,
@@ -116,16 +134,42 @@ describe("scanSchema", () => {
     vi.setSystemTime(new Date("2026-01-02T03:04:05.000Z"))
     stub.rows.set(TABLES_KEY, [{ table_name: "orders", table_comment: "订单表" }])
     stub.rows.set(COLUMNS_KEY, [
-      { column_name: "id", data_type: "integer", is_nullable: "NO", column_default: "nextval('orders_id_seq'::regclass)", column_comment: null, is_primary: true },
-      { column_name: "note", data_type: "text", is_nullable: "YES", column_default: null, column_comment: "备注", is_primary: false },
+      {
+        column_name: "id",
+        data_type: "integer",
+        is_nullable: "NO",
+        column_default: "nextval('orders_id_seq'::regclass)",
+        column_comment: null,
+        is_primary: true,
+      },
+      {
+        column_name: "note",
+        data_type: "text",
+        is_nullable: "YES",
+        column_default: null,
+        column_comment: "备注",
+        is_primary: false,
+      },
     ])
     stub.rows.set(INDEXES_KEY, [
-      { indexname: "orders_pkey", indexdef: "CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (id)" },
-      { indexname: "orders_region_idx", indexdef: "CREATE INDEX orders_region_idx ON public.orders USING btree (region)" },
+      {
+        indexname: "orders_pkey",
+        indexdef: "CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (id)",
+      },
+      {
+        indexname: "orders_region_idx",
+        indexdef: "CREATE INDEX orders_region_idx ON public.orders USING btree (region)",
+      },
     ])
     stub.rows.set(STATS_KEY, [{ estimate: "12345" }])
     stub.rows.set(RELATIONS_KEY, [
-      { constraint_name: "fk_orders_user", from_table: "orders", from_column: "user_id", to_table: "users", to_column: "id" },
+      {
+        constraint_name: "fk_orders_user",
+        from_table: "orders",
+        from_column: "user_id",
+        to_table: "users",
+        to_column: "id",
+      },
     ])
 
     const result = await scanSchema("conn-1")
@@ -138,8 +182,22 @@ describe("scanSchema", () => {
         schema: "public",
         comment: "订单表",
         columns: [
-          { name: "id", type: "integer", nullable: false, isPrimary: true, comment: null, defaultValue: "nextval('orders_id_seq'::regclass)" },
-          { name: "note", type: "text", nullable: true, isPrimary: false, comment: "备注", defaultValue: null },
+          {
+            name: "id",
+            type: "integer",
+            nullable: false,
+            isPrimary: true,
+            comment: null,
+            defaultValue: "nextval('orders_id_seq'::regclass)",
+          },
+          {
+            name: "note",
+            type: "text",
+            nullable: true,
+            isPrimary: false,
+            comment: "备注",
+            defaultValue: null,
+          },
         ],
         indexes: [
           { name: "orders_pkey", columns: [], unique: true },
@@ -149,7 +207,13 @@ describe("scanSchema", () => {
       },
     ])
     expect(result.relations).toEqual([
-      { name: "fk_orders_user", fromTable: "orders", fromColumn: "user_id", toTable: "users", toColumn: "id" },
+      {
+        name: "fk_orders_user",
+        fromTable: "orders",
+        fromColumn: "user_id",
+        toTable: "users",
+        toColumn: "id",
+      },
     ])
   })
 
@@ -186,7 +250,14 @@ describe("scanSchema", () => {
     const result = await scanSchema("conn-1")
 
     expect(result.tables).toEqual([
-      { name: "empty_t", schema: "public", comment: null, columns: [], indexes: [], rowEstimate: 0 },
+      {
+        name: "empty_t",
+        schema: "public",
+        comment: null,
+        columns: [],
+        indexes: [],
+        rowEstimate: 0,
+      },
     ])
     expect(result.relations).toEqual([])
   })
@@ -215,14 +286,32 @@ describe("scanSchema", () => {
 
     await scanSchema("conn-1")
 
-    expect(stub.calls.map((c) => (c.sql.includes(TABLES_KEY) ? "tables" : c.sql.includes(COLUMNS_KEY) ? "columns" : c.sql.includes(INDEXES_KEY) ? "indexes" : c.sql.includes(STATS_KEY) ? "stats" : "relations")))
-      .toEqual(["tables", "columns", "indexes", "stats", "columns", "indexes", "stats", "relations"])
+    expect(
+      stub.calls.map((c) =>
+        c.sql.includes(TABLES_KEY)
+          ? "tables"
+          : c.sql.includes(COLUMNS_KEY)
+            ? "columns"
+            : c.sql.includes(INDEXES_KEY)
+              ? "indexes"
+              : c.sql.includes(STATS_KEY)
+                ? "stats"
+                : "relations",
+      ),
+    ).toEqual(["tables", "columns", "indexes", "stats", "columns", "indexes", "stats", "relations"])
   })
 })
 
 describe("buildSchemaContext", () => {
   it("骨架：标题 + 约束语 + 表结构小节 + 表名", () => {
-    const text = buildSchemaContext(schema([table({ name: "orders", columns: [column({ name: "id", type: "integer", nullable: false, isPrimary: true })] })]))
+    const text = buildSchemaContext(
+      schema([
+        table({
+          name: "orders",
+          columns: [column({ name: "id", type: "integer", nullable: false, isPrimary: true })],
+        }),
+      ]),
+    )
 
     expect(text.startsWith("## 数据库结构\n\n")).toBe(true)
     expect(text).toContain("只使用下方真实存在的表、列和关系")
@@ -252,7 +341,18 @@ describe("buildSchemaContext", () => {
     expect(buildSchemaContext(schema([]))).not.toContain("### 表关系")
 
     const withRelation = buildSchemaContext(
-      schema([], [{ name: "fk1", fromTable: "orders", fromColumn: "user_id", toTable: "users", toColumn: "id" }]),
+      schema(
+        [],
+        [
+          {
+            name: "fk1",
+            fromTable: "orders",
+            fromColumn: "user_id",
+            toTable: "users",
+            toColumn: "id",
+          },
+        ],
+      ),
     )
     expect(withRelation).toContain("### 表关系\n- orders.user_id -> users.id\n")
   })
@@ -273,7 +373,15 @@ describe("buildDataProfileText", () => {
   it("Markdown 表格骨架，样本只取前 3 个", () => {
     const text = buildDataProfileText([
       profile("orders", 1234, [
-        profileColumn({ name: "amount", type: "numeric", distinctCount: 900, nullCount: 34, min: 1, max: 999, samples: [10, 20, 30, 40] }),
+        profileColumn({
+          name: "amount",
+          type: "numeric",
+          distinctCount: 900,
+          nullCount: 34,
+          min: 1,
+          max: 999,
+          samples: [10, 20, 30, 40],
+        }),
       ]),
     ])
 
@@ -297,7 +405,14 @@ describe("buildDataProfileText", () => {
   it("样本转义竖线并把换行折成空格；min/max 只转义竖线（现状：极值含换行会撑破表格）", () => {
     const text = buildDataProfileText([
       profile("orders", 5, [
-        profileColumn({ name: "raw", type: "text", distinctCount: 3, min: "a|b", max: "c\nd", samples: ["x|y", "p\nq"] }),
+        profileColumn({
+          name: "raw",
+          type: "text",
+          distinctCount: 3,
+          min: "a|b",
+          max: "c\nd",
+          samples: ["x|y", "p\nq"],
+        }),
       ]),
     ])
 
@@ -306,7 +421,9 @@ describe("buildDataProfileText", () => {
 
   it("多表按顺序拼接，表与表之间留一个空行", () => {
     const text = buildDataProfileText([
-      profile("orders", 1234, [profileColumn({ name: "a", type: "integer", distinctCount: 1, min: 1, max: 1 })]),
+      profile("orders", 1234, [
+        profileColumn({ name: "a", type: "integer", distinctCount: 1, min: 1, max: 1 }),
+      ]),
       profile("users", 7, []),
     ])
 

@@ -55,7 +55,8 @@ export function loadWorkspace(connectionId: string | null): LoadedWorkspace | nu
     const parsed: unknown = JSON.parse(raw)
     if (!isRecord(parsed) || parsed.version !== WORKSPACE_STORE_VERSION) return null
     const session = parsed.session
-    if (!isRecord(session) || typeof session.id !== "string" || !isRecord(session.querySpec)) return null
+    if (!isRecord(session) || typeof session.id !== "string" || !isRecord(session.querySpec))
+      return null
     if (!isRecord(session.displayConfig) || !Array.isArray(session.conversationHistory)) return null
 
     const restored = session as unknown as AnalysisSession

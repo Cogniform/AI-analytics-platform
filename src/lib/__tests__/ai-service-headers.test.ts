@@ -3,7 +3,9 @@ import { parseHeaderTemplates, resolveRequestHeaders } from "../ai-config"
 
 describe("parseHeaderTemplates", () => {
   it("解析 JSON 对象，忽略非字符串与空值", () => {
-    expect(parseHeaderTemplates('{"x-session":"{sessionId}","count":1,"empty":"","ok":"v"}')).toEqual({
+    expect(
+      parseHeaderTemplates('{"x-session":"{sessionId}","count":1,"empty":"","ok":"v"}'),
+    ).toEqual({
       "x-session": "{sessionId}",
       ok: "v",
     })
@@ -19,9 +21,16 @@ describe("parseHeaderTemplates", () => {
 
 describe("resolveRequestHeaders", () => {
   it("替换 {sessionId} 与 {version}，并补默认 User-Agent", () => {
-    const headers = resolveRequestHeaders({ "x-gateway-session": "{sessionId}", "X-Env": "app/{version}" }, { sessionId: "conv-1", version: "9.9.9" })
+    const headers = resolveRequestHeaders(
+      { "x-gateway-session": "{sessionId}", "X-Env": "app/{version}" },
+      { sessionId: "conv-1", version: "9.9.9" },
+    )
 
-    expect(headers).toEqual({ "x-gateway-session": "conv-1", "X-Env": "app/9.9.9", "User-Agent": "ai-analytics-platform/9.9.9" })
+    expect(headers).toEqual({
+      "x-gateway-session": "conv-1",
+      "X-Env": "app/9.9.9",
+      "User-Agent": "ai-analytics-platform/9.9.9",
+    })
   })
 
   it("没有会话时丢弃带 {sessionId} 的头，而不是发送空值", () => {

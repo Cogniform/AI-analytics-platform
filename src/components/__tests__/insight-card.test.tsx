@@ -12,28 +12,21 @@ const baseItem: InsightItem = {
   fallback: true,
 }
 
-async function renderCard(
-  props: Partial<React.ComponentProps<typeof InsightCard>> = {}
-) {
+async function renderCard(props: Partial<React.ComponentProps<typeof InsightCard>> = {}) {
   const container = document.createElement("div")
   document.body.appendChild(container)
   const root = createRoot(container)
   const onExecute = vi.fn()
   await act(async () => {
-    root.render(
-      <InsightCard
-        index={0}
-        item={baseItem}
-        onExecute={onExecute}
-        {...props}
-      />
-    )
+    root.render(<InsightCard index={0} item={baseItem} onExecute={onExecute} {...props} />)
   })
   return { container, root, onExecute }
 }
 
 describe("InsightCard", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   afterEach(() => {
     document.body.replaceChildren()
@@ -49,7 +42,7 @@ describe("InsightCard", () => {
   it("calls onExecute with sql and chart on click", async () => {
     const { container, root, onExecute } = await renderCard()
     const executeButton = Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find(
-      (b) => b.textContent?.includes("执行")
+      (b) => b.textContent?.includes("执行"),
     )
     expect(executeButton).toBeDefined()
     await act(async () => executeButton!.click())
@@ -60,7 +53,7 @@ describe("InsightCard", () => {
   it("disables execute while loading", async () => {
     const { container, root, onExecute } = await renderCard({ loading: true })
     const executeButton = Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find(
-      (b) => b.textContent?.includes("执行")
+      (b) => b.textContent?.includes("执行"),
     )
     expect(executeButton?.disabled).toBe(true)
     await act(async () => executeButton!.click())

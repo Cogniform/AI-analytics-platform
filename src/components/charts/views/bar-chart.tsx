@@ -65,24 +65,22 @@ export const BarChartView = React.memo(function BarChartView({
               key={g}
               dataKey={g}
               fill={getColor(i)}
-              radius={mode !== "grouped" ? (i === groups.length - 1 ? [3, 3, 0, 0] : [0, 0, 0, 0]) : [3, 3, 0, 0]}
+              radius={
+                mode !== "grouped"
+                  ? i === groups.length - 1
+                    ? [3, 3, 0, 0]
+                    : [0, 0, 0, 0]
+                  : [3, 3, 0, 0]
+              }
               maxBarSize={maxBarSize}
               {...(mode === "grouped" ? {} : { stackId: "stack" })}
             />
           ))
         ) : (
-          <Bar
-            dataKey={yKey}
-            fill={getColor(0)}
-            radius={[3, 3, 0, 0]}
-            maxBarSize={maxBarSize}
-          />
+          <Bar dataKey={yKey} fill={getColor(0)} radius={[3, 3, 0, 0]} maxBarSize={maxBarSize} />
         )}
         {groups.length > 0 && showLegend && (
-          <Legend
-            wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-            iconType="square"
-          />
+          <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} iconType="square" />
         )}
       </BarChart>
     </ResponsiveContainer>

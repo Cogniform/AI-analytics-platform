@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest"
-import { SPLIT_PRESETS, SPLIT_STORAGE_PREFIX, clampRatio, readStoredRatio, writeStoredRatio } from "../split"
+import {
+  SPLIT_PRESETS,
+  SPLIT_STORAGE_PREFIX,
+  clampRatio,
+  readStoredRatio,
+  writeStoredRatio,
+} from "../split"
 
 const BOUNDS = { min: 0.2, max: 0.8 }
 
@@ -42,9 +48,15 @@ describe("分割预设", () => {
 describe("分割比例持久化", () => {
   it("读：无记录用默认，损坏记录回退默认，越界记录夹紧", () => {
     expect(readStoredRatio("k", 0.6, BOUNDS, fakeStorage())).toBe(0.6)
-    expect(readStoredRatio("k", 0.6, BOUNDS, fakeStorage({ [SPLIT_STORAGE_PREFIX + "k"]: "abc" }))).toBe(0.6)
-    expect(readStoredRatio("k", 0.6, BOUNDS, fakeStorage({ [SPLIT_STORAGE_PREFIX + "k"]: "0.95" }))).toBe(0.8)
-    expect(readStoredRatio("k", 0.6, BOUNDS, fakeStorage({ [SPLIT_STORAGE_PREFIX + "k"]: "0.42" }))).toBe(0.42)
+    expect(
+      readStoredRatio("k", 0.6, BOUNDS, fakeStorage({ [SPLIT_STORAGE_PREFIX + "k"]: "abc" })),
+    ).toBe(0.6)
+    expect(
+      readStoredRatio("k", 0.6, BOUNDS, fakeStorage({ [SPLIT_STORAGE_PREFIX + "k"]: "0.95" })),
+    ).toBe(0.8)
+    expect(
+      readStoredRatio("k", 0.6, BOUNDS, fakeStorage({ [SPLIT_STORAGE_PREFIX + "k"]: "0.42" })),
+    ).toBe(0.42)
   })
 
   it("写：带统一前缀；存储不可用时静默", () => {

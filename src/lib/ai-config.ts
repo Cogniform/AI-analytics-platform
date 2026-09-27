@@ -6,7 +6,11 @@ const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || "dev"
  */
 export type ResponseFormatMode = "json_schema" | "json_object" | "none"
 
-const RESPONSE_FORMAT_CHAIN = ["json_schema", "json_object", "none"] as const satisfies readonly ResponseFormatMode[]
+const RESPONSE_FORMAT_CHAIN = [
+  "json_schema",
+  "json_object",
+  "none",
+] as const satisfies readonly ResponseFormatMode[]
 
 /** AI_RESPONSE_FORMAT 指定起点；未配置或非法值从最强档开始 */
 export function parseResponseFormatChain(raw: string | undefined): ResponseFormatMode[] {
@@ -50,7 +54,9 @@ export function parseHeaderTemplates(raw: string | undefined): Record<string, st
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {}
     return Object.fromEntries(
       Object.entries(parsed as Record<string, unknown>)
-        .filter((entry): entry is [string, string] => typeof entry[1] === "string" && entry[1].length > 0)
+        .filter(
+          (entry): entry is [string, string] => typeof entry[1] === "string" && entry[1].length > 0,
+        )
         .map(([name, value]) => [name, value]),
     )
   } catch {

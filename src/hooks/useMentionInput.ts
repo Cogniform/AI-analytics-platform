@@ -1,7 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { extractPendingMention, filterTables, replaceMention, type MentionTable } from "@/lib/mention"
+import {
+  extractPendingMention,
+  filterTables,
+  replaceMention,
+  type MentionTable,
+} from "@/lib/mention"
 
 export interface UseMentionInputOptions {
   value: string
@@ -45,7 +50,7 @@ export function useMentionInput({
 
   const filtered = useMemo(
     () => filterTables(tables, pendingMention ?? ""),
-    [tables, pendingMention]
+    [tables, pendingMention],
   )
 
   // 派生：正在输入 @ 词 且 未被外部点击关闭 且 有候选 → 打开面板
@@ -70,7 +75,7 @@ export function useMentionInput({
       setDismissed(false)
       setActiveIndex(0)
     },
-    [onChange]
+    [onChange],
   )
 
   const select = useCallback(
@@ -79,7 +84,7 @@ export function useMentionInput({
       setDismissed(false)
       inputRef.current?.focus()
     },
-    [value, onChange]
+    [value, onChange],
   )
 
   const close = useCallback(() => setDismissed(true), [])
@@ -118,7 +123,7 @@ export function useMentionInput({
         onSend()
       }
     },
-    [mentionOpen, filtered, activeIndex, select, onSend]
+    [mentionOpen, filtered, activeIndex, select, onSend],
   )
 
   return {

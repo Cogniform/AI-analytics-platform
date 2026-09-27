@@ -8,7 +8,11 @@ function pool() {
 describe("PoolRegistry", () => {
   it("deduplicates concurrent creation and evicts the least recently used pool", async () => {
     let now = 0
-    const registry = new PoolRegistry<{ end(): Promise<void> }>({ maxEntries: 2, idleMs: 100, now: () => now })
+    const registry = new PoolRegistry<{ end(): Promise<void> }>({
+      maxEntries: 2,
+      idleMs: 100,
+      now: () => now,
+    })
     const first = pool()
     const createFirst = vi.fn(async () => first)
 
@@ -33,7 +37,11 @@ describe("PoolRegistry", () => {
 
   it("prunes idle pools and closes all remaining entries", async () => {
     let now = 0
-    const registry = new PoolRegistry<{ end(): Promise<void> }>({ maxEntries: 3, idleMs: 10, now: () => now })
+    const registry = new PoolRegistry<{ end(): Promise<void> }>({
+      maxEntries: 3,
+      idleMs: 10,
+      now: () => now,
+    })
     const first = pool()
     const second = pool()
     await registry.getOrCreate("a", async () => first)

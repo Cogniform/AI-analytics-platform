@@ -39,7 +39,7 @@ describe("light-only theme contract", () => {
 
     expect(interfaceSource).not.toMatch(/#[\da-f]{3,8}/i)
     expect(interfaceSource).not.toMatch(
-      /(?:bg|border|text)-(?:amber|black|blue|emerald|green|red|rose|yellow|white)-?[\d/]*/
+      /(?:bg|border|text)-(?:amber|black|blue|emerald|green|red|rose|yellow|white)-?[\d/]*/,
     )
     expect(staticUiSource).not.toContain("color-mix(")
   })

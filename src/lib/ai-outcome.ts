@@ -34,7 +34,8 @@ export function describeOutcome(input: {
   if (input.items.length > 0) return { reason: "ok", message: OUTCOME_MESSAGES.ok }
   const rawPreview = input.content.slice(0, 400)
   if (!input.content.trim()) return { reason: "empty", message: OUTCOME_MESSAGES.empty, rawPreview }
-  if (input.finishReason === "length") return { reason: "truncated", message: OUTCOME_MESSAGES.truncated, rawPreview }
+  if (input.finishReason === "length")
+    return { reason: "truncated", message: OUTCOME_MESSAGES.truncated, rawPreview }
   try {
     JSON.parse(input.content)
   } catch {

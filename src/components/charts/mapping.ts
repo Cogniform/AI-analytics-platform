@@ -1,8 +1,7 @@
 import type { ChartMapping, ChartType } from "./types"
 
 export type ChartMappingSlot =
-  | "x" | "y" | "color" | "fill" | "name" | "value"
-  | "category" | "label" | "comparison"
+  "x" | "y" | "color" | "fill" | "name" | "value" | "category" | "label" | "comparison"
 
 const MAPPING_SLOTS: Record<ChartType, readonly ChartMappingSlot[]> = {
   line: ["x", "y", "color"],
@@ -29,7 +28,11 @@ export function getMappingSlot(mapping: ChartMapping, slot: ChartMappingSlot): s
   return slots[slot]
 }
 
-export function setMappingSlot(mapping: ChartMapping, slot: ChartMappingSlot, value: string): ChartMapping {
+export function setMappingSlot(
+  mapping: ChartMapping,
+  slot: ChartMappingSlot,
+  value: string,
+): ChartMapping {
   if (!MAPPING_SLOTS[mapping.chartType].includes(slot)) return mapping
   const next = { ...mapping } as ChartMapping & Partial<Record<ChartMappingSlot, string>>
   if (value) next[slot] = value

@@ -34,16 +34,27 @@ export function useCorrelationMatrix(
 
   useEffect(() => {
     const requestId = ++requestIdRef.current
-    const worker = new Worker(new URL("./correlation.worker.ts", import.meta.url), { type: "module" })
+    const worker = new Worker(new URL("./correlation.worker.ts", import.meta.url), {
+      type: "module",
+    })
     worker.onmessage = (event: MessageEvent<CorrelationWorkerResponse>) => {
       if (event.data.requestId !== requestId) return
-      setCompleted(event.data.ok
-        ? { loading: false, result: event.data.result, error: null, rows, columns, method }
-        : { loading: false, result: null, error: event.data.error, rows, columns, method })
+      setCompleted(
+        event.data.ok
+          ? { loading: false, result: event.data.result, error: null, rows, columns, method }
+          : { loading: false, result: null, error: event.data.error, rows, columns, method },
+      )
     }
     worker.onerror = () => {
       if (requestIdRef.current === requestId) {
-        setCompleted({ loading: false, result: null, error: "相关矩阵计算失败", rows, columns, method })
+        setCompleted({
+          loading: false,
+          result: null,
+          error: "相关矩阵计算失败",
+          rows,
+          columns,
+          method,
+        })
       }
     }
 

@@ -1,6 +1,16 @@
 "use client"
 
-import { LineChart, BarChart3, PieChart, ScatterChart, Table2, Grid3X3, Box, Flame, Gauge } from "lucide-react"
+import {
+  LineChart,
+  BarChart3,
+  PieChart,
+  ScatterChart,
+  Table2,
+  Grid3X3,
+  Box,
+  Flame,
+  Gauge,
+} from "lucide-react"
 import type { ChartType } from "@/lib/variable-types"
 
 const ICON_MAP: Record<ChartType, React.ComponentType<{ className?: string | undefined }>> = {

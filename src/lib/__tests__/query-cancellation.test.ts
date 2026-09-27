@@ -10,7 +10,9 @@ describe("executeCancelable", () => {
     const start = vi.fn(async () => 1)
     const cancel = vi.fn(async () => undefined)
 
-    await expect(executeCancelable(start, cancel, controller.signal)).rejects.toBeInstanceOf(QueryCancelledError)
+    await expect(executeCancelable(start, cancel, controller.signal)).rejects.toBeInstanceOf(
+      QueryCancelledError,
+    )
     expect(start).not.toHaveBeenCalled()
     expect(cancel).not.toHaveBeenCalled()
   })
@@ -18,12 +20,15 @@ describe("executeCancelable", () => {
   it("cancels once and waits for the database operation to settle", async () => {
     const controller = new AbortController()
     let rejectQuery!: (error: Error) => void
-    const operation = new Promise<number>((_, reject) => { rejectQuery = reject })
+    const operation = new Promise<number>((_, reject) => {
+      rejectQuery = reject
+    })
     const cancel = vi.fn(async () => undefined)
     let settled = false
 
-    const execution = executeCancelable(() => operation, cancel, controller.signal)
-      .finally(() => { settled = true })
+    const execution = executeCancelable(() => operation, cancel, controller.signal).finally(() => {
+      settled = true
+    })
     controller.abort()
     controller.abort()
     await Promise.resolve()

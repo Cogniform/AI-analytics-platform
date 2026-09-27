@@ -1,5 +1,5 @@
-import type { NextConfig } from "next";
-import packageMetadata from "./package.json";
+import type { NextConfig } from "next"
+import packageMetadata from "./package.json"
 
 const nextConfig: NextConfig = {
   env: {
@@ -19,8 +19,8 @@ const nextConfig: NextConfig = {
           { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
         ],
       },
-    ];
+    ]
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

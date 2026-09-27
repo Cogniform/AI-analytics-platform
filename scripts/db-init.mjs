@@ -16,13 +16,16 @@ async function names(client, sql) {
   return new Set(rows.map((row) => row.name))
 }
 
-const TABLE_SQL = "select table_name as name from information_schema.tables where table_schema = 'public'"
+const TABLE_SQL =
+  "select table_name as name from information_schema.tables where table_schema = 'public'"
 const INDEX_SQL = "select indexname as name from pg_indexes where schemaname = 'public'"
 
 async function main() {
   const url = process.env.DATABASE_URL
   if (!url) {
-    console.error("缺少 DATABASE_URL：请用 npm run db:init（读 .env），或 node --env-file=<env 文件> scripts/db-init.mjs")
+    console.error(
+      "缺少 DATABASE_URL：请用 npm run db:init（读 .env），或 node --env-file=<env 文件> scripts/db-init.mjs",
+    )
     process.exitCode = 1
     return
   }
@@ -45,13 +48,17 @@ async function main() {
 
     console.log("元库初始化完成（幂等，可重复执行）")
     console.log("  新建表：" + (createdTables.length ? createdTables.join(", ") : "无（已是最新）"))
-    console.log("  新建索引：" + (createdIndexes.length ? createdIndexes.join(", ") : "无（已是最新）"))
+    console.log(
+      "  新建索引：" + (createdIndexes.length ? createdIndexes.join(", ") : "无（已是最新）"),
+    )
     console.log("  public schema 现有表：" + tablesAfter.size + " 张")
   } catch (error) {
     await client.query("rollback").catch(() => {})
     console.error("元库初始化失败（已回滚，未改动任何数据）：" + error.message)
     if (/schema_snapshots_one_active_per_connection|duplicate key/i.test(error.message)) {
-      console.error("  提示：库里存在重复的 active 快照，先清理重复（见 prisma/migrations/20260725130000_unique_active_schema_snapshot/）再重试")
+      console.error(
+        "  提示：库里存在重复的 active 快照，先清理重复（见 prisma/migrations/20260725130000_unique_active_schema_snapshot/）再重试",
+      )
     }
     process.exitCode = 1
   } finally {

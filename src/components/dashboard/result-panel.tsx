@@ -20,9 +20,20 @@ interface Props {
 
 const DEFAULT_MAPPING: ChartMapping = { chartType: "table" }
 
-export function ResultPanel({ result, onCopySql, initialMapping, mapping: controlledMapping, onMappingChange, embedded = false }: Props) {
+export function ResultPanel({
+  result,
+  onCopySql,
+  initialMapping,
+  mapping: controlledMapping,
+  onMappingChange,
+  embedded = false,
+}: Props) {
   const initial = initialMapping || DEFAULT_MAPPING
-  const [chartState, setChartState] = useState<{ result: QueryResult; initial: ChartMapping; mapping: ChartMapping }>({
+  const [chartState, setChartState] = useState<{
+    result: QueryResult
+    initial: ChartMapping
+    mapping: ChartMapping
+  }>({
     result,
     initial,
     mapping: initial,
@@ -66,7 +77,11 @@ export function ResultPanel({ result, onCopySql, initialMapping, mapping: contro
           className="h-6 gap-1 text-[11px] text-[var(--muted-foreground)]"
           onClick={handleCopy}
         >
-          {copied ? <Check className="h-3 w-3 text-[var(--success)]" /> : <Copy className="h-3 w-3" />}
+          {copied ? (
+            <Check className="h-3 w-3 text-[var(--success)]" />
+          ) : (
+            <Copy className="h-3 w-3" />
+          )}
           {copied ? "已复制" : "复制 SQL"}
         </Button>
       </div>

@@ -26,7 +26,10 @@ export interface AIContext {
 }
 
 /** 采集一次请求的全部上下文（AI 路由共用，避免各写一遍） */
-export async function collectAIContext(connectionId: string, input: AIContextInput): Promise<AIContext> {
+export async function collectAIContext(
+  connectionId: string,
+  input: AIContextInput,
+): Promise<AIContext> {
   const cached = await prisma.schemaSnapshot.findFirst({
     where: { connectionId, status: "active" },
     orderBy: { version: "desc" },

@@ -1,6 +1,11 @@
 import { AI_RESPONSE_JSON_SCHEMA, buildSystemPrompt, type InsightItem } from "./ai-contract"
 import { parseInsightItems } from "./ai-contract-parse"
-import { getDefaultProvider, type AICompletion, type AICompletionProvider, type AIMessage } from "./ai-provider"
+import {
+  getDefaultProvider,
+  type AICompletion,
+  type AICompletionProvider,
+  type AIMessage,
+} from "./ai-provider"
 import { describeOutcome, type AIOutcomeReason, type AIServiceResult } from "./ai-outcome"
 
 export async function generateAnalysis(
@@ -23,7 +28,11 @@ export async function generateAnalysis(
   // 有界修复：官方指出 json_object 存在空响应概率，推理模型也容易把 JSON 砍半句。
   // 只追加一条纠正指令再问一次（不是 agent loop，不引入工具与多轮规划）。
   warnUnusable("首次输出不可用", first)
-  const retry = await attemptAnalysis(provider, withRetryInstruction(messages, first.outcome.reason), sessionId)
+  const retry = await attemptAnalysis(
+    provider,
+    withRetryInstruction(messages, first.outcome.reason),
+    sessionId,
+  )
   if (retry.outcome.reason === "ok") return buildOkResult(retry, 2)
   warnUnusable("修复后仍不可用", retry)
   return buildRetryFailureResult(retry.completion, retry.outcome)

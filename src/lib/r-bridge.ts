@@ -133,7 +133,9 @@ export function generateRTemplate(dataset: SemanticDataset): string {
   lines.push("# 图形设备由 webR 管理，勿自行 webr::canvas() / dev.off()")
 
   const numericCols = columns.filter((c) => c.semanticType === "numeric")
-  const catCols = columns.filter((c) => c.semanticType === "categorical" || c.semanticType === "boolean")
+  const catCols = columns.filter(
+    (c) => c.semanticType === "categorical" || c.semanticType === "boolean",
+  )
   const temporalCols = columns.filter((c) => c.semanticType === "temporal")
 
   // 顶层表达式由 captureR 的 withAutoprint 自动打印，裸写即可；最后一支走 base 图形
@@ -192,7 +194,7 @@ export function exportCSV(dataset: SemanticDataset): string {
         }
         return str
       })
-      .join(",")
+      .join(","),
   )
   return `\uFEFF${headers}\n${rows.join("\n")}`
 }

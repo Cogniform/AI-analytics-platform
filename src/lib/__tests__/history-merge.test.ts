@@ -9,14 +9,32 @@ function sqlItem(id: string, sql: string, createdAt: string, status = "success")
 
 function aiEntry(id: string, createdAt: string, sql?: string, sqlValid = true): HistoryEntry {
   return {
-    id, connectionId: "c1", sessionId: "s1", createdAt, kind: "ai",
-    question: "按区域统计", ok: true, summary: "华东最高",
-    items: sql ? [{ title: "t", insight: "i", sql, sqlValid, chart: { chartType: "table" }, fallback: true }] : [],
+    id,
+    connectionId: "c1",
+    sessionId: "s1",
+    createdAt,
+    kind: "ai",
+    question: "按区域统计",
+    ok: true,
+    summary: "华东最高",
+    items: sql
+      ? [{ title: "t", insight: "i", sql, sqlValid, chart: { chartType: "table" }, fallback: true }]
+      : [],
   }
 }
 
 function rEntry(id: string, createdAt: string, sourceSql?: string): HistoryEntry {
-  return { id, connectionId: "c1", sessionId: "s1", createdAt, kind: "r", code: "summary(df)", sourceSql, output: [], ok: true }
+  return {
+    id,
+    connectionId: "c1",
+    sessionId: "s1",
+    createdAt,
+    kind: "r",
+    code: "summary(df)",
+    sourceSql,
+    output: [],
+    ok: true,
+  }
 }
 
 describe("mergeHistoryTimeline", () => {
@@ -30,12 +48,18 @@ describe("mergeHistoryTimeline", () => {
 
   it("同刻稳定排序：SQL 在前（后端权威源优先）", () => {
     const at = "2026-09-11T09:00:00Z"
-    const items = mergeHistoryTimeline([sqlItem("q1", "SELECT 1", at)], [rEntry("r1", at), aiEntry("a1", at)])
+    const items = mergeHistoryTimeline(
+      [sqlItem("q1", "SELECT 1", at)],
+      [rEntry("r1", at), aiEntry("a1", at)],
+    )
     expect(items.map((i) => i.kind)).toEqual(["sql", "ai", "r"])
   })
 
   it("createdAt 非法的条目排在末尾且不丢弃", () => {
-    const items = mergeHistoryTimeline([sqlItem("q1", "SELECT 1", "not-a-date")], [rEntry("r1", "2026-09-11T09:00:00Z")])
+    const items = mergeHistoryTimeline(
+      [sqlItem("q1", "SELECT 1", "not-a-date")],
+      [rEntry("r1", "2026-09-11T09:00:00Z")],
+    )
     expect(items.map((i) => i.kind)).toEqual(["r", "sql"])
   })
 
@@ -60,7 +84,10 @@ describe("mergeHistoryTimeline", () => {
   })
 
   it("复制文本：AI 用完整问题，SQL/R 用代码原文", () => {
-    const items = mergeHistoryTimeline([sqlItem("q1", "SELECT 1", "2026-09-11T09:00:00Z")], [aiEntry("a1", "2026-09-11T09:00:01Z"), rEntry("r1", "2026-09-11T09:00:02Z")])
+    const items = mergeHistoryTimeline(
+      [sqlItem("q1", "SELECT 1", "2026-09-11T09:00:00Z")],
+      [aiEntry("a1", "2026-09-11T09:00:01Z"), rEntry("r1", "2026-09-11T09:00:02Z")],
+    )
     const byKind = Object.fromEntries(items.map((i) => [i.kind, i]))
     expect(byKind.ai?.copyText).toBe("按区域统计")
     expect(byKind.sql?.copyText).toBe("SELECT 1")
@@ -87,8 +114,14 @@ describe("filterTimeline", () => {
 
 describe("aiOpenableSql", () => {
   it("只认通过只读预检的回退 SQL", () => {
-    const valid = aiEntry("a1", "2026-09-11T09:00:00Z", "SELECT 1") as Extract<HistoryEntry, { kind: "ai" }>
-    const invalid = aiEntry("a2", "2026-09-11T09:00:00Z", "DROP TABLE x", false) as Extract<HistoryEntry, { kind: "ai" }>
+    const valid = aiEntry("a1", "2026-09-11T09:00:00Z", "SELECT 1") as Extract<
+      HistoryEntry,
+      { kind: "ai" }
+    >
+    const invalid = aiEntry("a2", "2026-09-11T09:00:00Z", "DROP TABLE x", false) as Extract<
+      HistoryEntry,
+      { kind: "ai" }
+    >
     expect(aiOpenableSql(valid)).toBe("SELECT 1")
     expect(aiOpenableSql(invalid)).toBeNull()
   })

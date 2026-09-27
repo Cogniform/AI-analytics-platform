@@ -93,7 +93,9 @@ describe("validateDisplayConfig（data 模式）", () => {
     }
     const result = validateDisplayConfig(config, { mode: "data", dataset })
     expect(result.valid).toBe(true)
-    expect(result.issues.some((i) => i.code === "INVALID_NUMERIC" && i.severity === "warning")).toBe(true)
+    expect(
+      result.issues.some((i) => i.code === "INVALID_NUMERIC" && i.severity === "warning"),
+    ).toBe(true)
   })
 
   it("重复坐标产生 DUPLICATE_COORDINATE 错误（line 和 bar）", () => {
@@ -115,7 +117,11 @@ describe("validateDisplayConfig（data 模式）", () => {
   it("correlation 校验非数值列", () => {
     const config: DisplayConfig = {
       chartType: "correlation",
-      mapping: { chartType: "correlation", columns: ["amount", "customer_name"], method: "pearson" },
+      mapping: {
+        chartType: "correlation",
+        columns: ["amount", "customer_name"],
+        method: "pearson",
+      },
     }
     const result = validateDisplayConfig(config, { mode: "data", dataset })
     expect(result.valid).toBe(false)
@@ -142,6 +148,8 @@ describe("validateDisplayConfig（data 模式）", () => {
       },
     })
     expect(result.valid).toBe(true)
-    expect(result.issues.some((i) => i.code === "HIGH_CARDINALITY" && i.severity === "warning")).toBe(true)
+    expect(
+      result.issues.some((i) => i.code === "HIGH_CARDINALITY" && i.severity === "warning"),
+    ).toBe(true)
   })
 })

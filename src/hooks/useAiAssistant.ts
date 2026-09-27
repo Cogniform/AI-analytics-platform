@@ -48,7 +48,6 @@ export interface AiAssistant {
   clearInsights: () => void
 }
 
-
 function assistantMessage(content: string): ConversationMessage {
   return { role: "assistant", content, createdAt: new Date() }
 }
@@ -91,7 +90,10 @@ export function useAiAssistant({
     setAsking(true)
     try {
       const data = await fetchApi<
-        ApiResponse<{ items: InsightItem[]; diagnostics?: { reason: string; message: string; attempts: number } }>
+        ApiResponse<{
+          items: InsightItem[]
+          diagnostics?: { reason: string; message: string; attempts: number }
+        }>
       >("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,7 +112,11 @@ export function useAiAssistant({
         }),
       })
       if (!data.success) {
-        throw new ApiRequestError(data.error.message || "AI 分析失败", data.error.code, data.error.retryable)
+        throw new ApiRequestError(
+          data.error.message || "AI 分析失败",
+          data.error.code,
+          data.error.retryable,
+        )
       }
       const items = data.data.items
       if (items.length === 0) {
@@ -136,7 +142,10 @@ export function useAiAssistant({
       const first = items[0]
       if (first === undefined) throw new Error("items 首项缺失")
       const ran = applyInsight(first, question, 0)
-      dispatch({ type: "ADD_CONVERSATION", message: assistantMessage(first.insight || first.title) })
+      dispatch({
+        type: "ADD_CONVERSATION",
+        message: assistantMessage(first.insight || first.title),
+      })
       notify(
         ran
           ? `已生成 ${items.length} 条分析，执行第 1 条`
@@ -155,7 +164,15 @@ export function useAiAssistant({
     } catch (error) {
       const { message, notConfigured } = describeAskFailure(error)
       dispatch({ type: "ADD_CONVERSATION", message: assistantMessage(message) })
-      appendHistory({ kind: "ai", connectionId, sessionId: session.id, question, ok: false, summary: message, items: [] })
+      appendHistory({
+        kind: "ai",
+        connectionId,
+        sessionId: session.id,
+        question,
+        ok: false,
+        summary: message,
+        items: [],
+      })
       if (notConfigured) {
         setUnavailable(true)
         notify("AI 服务未配置，请在 .env 文件中设置 AI_API_KEY", "warning")

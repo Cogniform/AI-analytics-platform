@@ -1,6 +1,6 @@
 // 数据轮廓扫描：列的唯一值数 / NULL 数 / min-max / 样本值与喂给 AI 的 Markdown 文本。
 // 连接与池的创建沿用 schema-service 的 getPool；平台表清单也由它一处声明（勿在此重复）。
-import { PLATFORM_TABLES, getPool } from './schema-service'
+import { PLATFORM_TABLES, getPool } from "./schema-service"
 
 export interface ColumnDataProfile {
   name: string
@@ -28,9 +28,7 @@ function profileQuoteIdent(name: string): string {
 /** 只有可排序类型才计算 min/max（boolean/json/数组等不支持 min/max 聚合） */
 function supportsMinMax(type: string): boolean {
   return (
-    PROFILE_NUMERIC_TYPES.test(type) ||
-    PROFILE_TEMPORAL_TYPES.test(type) ||
-    /char|text/i.test(type)
+    PROFILE_NUMERIC_TYPES.test(type) || PROFILE_TEMPORAL_TYPES.test(type) || /char|text/i.test(type)
   )
 }
 
@@ -58,12 +56,12 @@ export async function scanDataProfile(
       const c = profileQuoteIdent(col.column_name)
       const minMax = supportsMinMax(col.data_type)
         ? `, min(${c}) AS mn_${i}, max(${c}) AS mx_${i}`
-        : ''
+        : ""
       return `count(${c}) AS n_${i}, count(DISTINCT ${c}) AS d_${i}${minMax}`
     })
     const countSql =
       aggregates.length > 0
-        ? `SELECT count(*) AS total_count, ${aggregates.join(', ')} FROM ${table}`
+        ? `SELECT count(*) AS total_count, ${aggregates.join(", ")} FROM ${table}`
         : `SELECT count(*) AS total_count FROM ${table}`
     const countResult = await pool.query(countSql)
     const stats = countResult.rows[0] ?? {}
@@ -71,7 +69,7 @@ export async function scanDataProfile(
     // 3. 样本值（单查询，最多 20 行，每列取至多 5 个不同非空值）
     const sampleSql =
       columns.length > 0
-        ? `SELECT ${columns.map((col) => profileQuoteIdent(col.column_name)).join(', ')} FROM ${table} LIMIT 20`
+        ? `SELECT ${columns.map((col) => profileQuoteIdent(col.column_name)).join(", ")} FROM ${table} LIMIT 20`
         : `SELECT * FROM ${table} LIMIT 20`
     const sampleResult = await pool.query(sampleSql)
 
@@ -81,7 +79,7 @@ export async function scanDataProfile(
       const seen = new Set<string>()
       for (const row of sampleResult.rows) {
         const v = row[col.column_name]
-        if (v !== null && v !== undefined && v !== '') {
+        if (v !== null && v !== undefined && v !== "") {
           const key = String(v)
           if (!seen.has(key)) {
             seen.add(key)
@@ -118,7 +116,7 @@ export async function scanAllDataProfiles(
     const result = await pool.query(
       `SELECT table_name FROM information_schema.tables
        WHERE table_schema = 'public'
-         AND table_name NOT IN (${PLATFORM_TABLES.map((_, i) => `$${i + 1}`).join(',')})
+         AND table_name NOT IN (${PLATFORM_TABLES.map((_, i) => `$${i + 1}`).join(",")})
        ORDER BY table_name LIMIT $${PLATFORM_TABLES.length + 1}`,
       [...PLATFORM_TABLES, maxTables],
     )
@@ -135,22 +133,22 @@ export async function scanAllDataProfiles(
 
 /** 生成 Markdown 表格格式的 Prompt 文本 */
 export function buildDataProfileText(profiles: TableDataProfile[]): string {
-  if (profiles.length === 0) return ''
-  let text = '## 数据轮廓（辅助判断字段类型与基数）\n\n'
+  if (profiles.length === 0) return ""
+  let text = "## 数据轮廓（辅助判断字段类型与基数）\n\n"
   for (const profile of profiles) {
     text += `### ${profile.table}（${profile.rowCount} 行）\n\n`
-    text += '| 列 | 类型 | 唯一值 | NULL | 最小值 | 最大值 | 样本 |\n'
-    text += '|----|------|--------|------|--------|--------|------|\n'
+    text += "| 列 | 类型 | 唯一值 | NULL | 最小值 | 最大值 | 样本 |\n"
+    text += "|----|------|--------|------|--------|--------|------|\n"
     for (const col of profile.columns) {
       const samples = col.samples
         .slice(0, 3)
-        .map((s) => `\`${String(s).replace(/\|/g, '\\|').replace(/\n/g, ' ')}\``)
-        .join(', ')
-      const min = col.min !== null ? String(col.min).replace(/\|/g, '\\|') : ''
-      const max = col.max !== null ? String(col.max).replace(/\|/g, '\\|') : ''
+        .map((s) => `\`${String(s).replace(/\|/g, "\\|").replace(/\n/g, " ")}\``)
+        .join(", ")
+      const min = col.min !== null ? String(col.min).replace(/\|/g, "\\|") : ""
+      const max = col.max !== null ? String(col.max).replace(/\|/g, "\\|") : ""
       text += `| ${col.name} | ${col.type} | ${col.distinctCount} | ${col.nullCount} | ${min} | ${max} | ${samples} |\n`
     }
-    text += '\n'
+    text += "\n"
   }
   return text
 }

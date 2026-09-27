@@ -44,7 +44,7 @@ export function useWebR(): UseWebRReturn {
 
   const state = useSyncExternalStore(
     useCallback((cb: () => void) => client.subscribe(cb), [client]),
-    () => client.getState()
+    () => client.getState(),
   )
 
   const actions = useMemo(
@@ -60,7 +60,7 @@ export function useWebR(): UseWebRReturn {
       reportError: (message: string) => client.reportError(message),
       runStats: (code: string) => client.runStats(code),
     }),
-    [client]
+    [client],
   )
 
   return {

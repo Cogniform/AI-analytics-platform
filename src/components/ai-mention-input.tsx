@@ -16,7 +16,14 @@ interface AiMentionInputProps {
 }
 
 /** AI 提及输入框：@ 弹表选择（键盘/鼠标），选中保留 "@表名" 语法作为显式上下文。 */
-export function AiMentionInput({ value, onChange, onSend, disabled, placeholder, schema }: AiMentionInputProps) {
+export function AiMentionInput({
+  value,
+  onChange,
+  onSend,
+  disabled,
+  placeholder,
+  schema,
+}: AiMentionInputProps) {
   const tables = useMemo(() => schema?.tables ?? [], [schema])
 
   const {
@@ -33,7 +40,8 @@ export function AiMentionInput({ value, onChange, onSend, disabled, placeholder,
 
   // 组合框语义：面板 id 与高亮选项 id 关联（aria-activedescendant）
   const panelId = useId()
-  const activeOptionId = mentionOpen && activeIndex >= 0 ? `${panelId}-option-${activeIndex}` : undefined
+  const activeOptionId =
+    mentionOpen && activeIndex >= 0 ? `${panelId}-option-${activeIndex}` : undefined
 
   return (
     <div className="relative flex-1 min-w-0">

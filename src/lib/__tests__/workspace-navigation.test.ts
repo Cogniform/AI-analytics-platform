@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
 
-import { buildHistoryWorkspaceUrl, buildWorkspaceUrl, normalizeWorkspaceSql, parseRHistoryParam, workspaceSqlKey } from "../workspace-navigation"
+import {
+  buildHistoryWorkspaceUrl,
+  buildWorkspaceUrl,
+  normalizeWorkspaceSql,
+  parseRHistoryParam,
+  workspaceSqlKey,
+} from "../workspace-navigation"
 
 describe("buildWorkspaceUrl", () => {
   it("returns null when the connection or SQL is missing", () => {
@@ -30,8 +36,12 @@ describe("buildWorkspaceUrl", () => {
 
 describe("buildHistoryWorkspaceUrl", () => {
   it("无回放 id 时与 buildWorkspaceUrl 一致", () => {
-    expect(buildHistoryWorkspaceUrl("connection-1", "SELECT 1")).toBe(buildWorkspaceUrl("connection-1", "SELECT 1"))
-    expect(buildHistoryWorkspaceUrl("connection-1", "SELECT 1", null)).toBe(buildWorkspaceUrl("connection-1", "SELECT 1"))
+    expect(buildHistoryWorkspaceUrl("connection-1", "SELECT 1")).toBe(
+      buildWorkspaceUrl("connection-1", "SELECT 1"),
+    )
+    expect(buildHistoryWorkspaceUrl("connection-1", "SELECT 1", null)).toBe(
+      buildWorkspaceUrl("connection-1", "SELECT 1"),
+    )
   })
 
   it("带回放 id 时追加 r 参数并编码", () => {
