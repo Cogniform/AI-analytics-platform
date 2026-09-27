@@ -1,7 +1,8 @@
 # 决策：工具链与依赖治理（Node 基线、元库可重建、回归守卫、npm 纪律）
 
+状态：生效
+
 - 日期：2026-09-11
-- 状态：已实施（阶段式落地，每阶段一个提交）
 - 范围：`.node-version`/`.nvmrc`/`package.json`/`package-lock.json`、`.github/workflows/ci.yml`、`.github/dependabot.yml`、`prisma/bootstrap.sql`、`scripts/db-init.mjs`、`scripts/check-db-drift.mjs`、`scripts/requirements.txt`、README 双语、[docs/operations.md](../../docs/operations.md)、[docs/verification.md](../../docs/verification.md)、[docs/maintenance-checklist.md](../../docs/maintenance-checklist.md)
 
 ## 问题

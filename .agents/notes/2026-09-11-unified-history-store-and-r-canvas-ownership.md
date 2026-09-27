@@ -1,5 +1,7 @@
 # 统一历史记录模块 + R 画布所有权与注入串行化
 
+状态：生效
+
 - 日期：2026-09-11
 - 范围：`src/lib/history-store.ts`（新增）、`src/lib/webr-client.ts`、`src/hooks/useWebR.ts`、`src/components/r-workbench/*`、`src/hooks/useAiAssistant.ts`、`src/lib/split.ts`
 

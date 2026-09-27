@@ -1,7 +1,8 @@
 # 决策：统一历史时间线（SQL/AI/R 合并浏览与回放）
 
+状态：生效
+
 - 日期：2026-09-11
-- 状态：已实施
 - 范围：`src/lib/history-store.ts`（v2）、`src/lib/history-merge.ts`（新增）、`src/components/history-timeline.tsx`（新增）、`src/app/queries/page.tsx`、`src/lib/workspace-navigation.ts`、`src/components/SessionView.tsx`、`src/components/r-workbench/r-workbench.tsx`、`src/components/workspace/session-workspace.tsx`、`src/app/workspace/page.tsx`、`src/hooks/useAiAssistant.ts`
 - 前序：[2026-09-11-unified-history-store-and-r-canvas-ownership.md](2026-09-11-unified-history-store-and-r-canvas-ownership.md)（统一存储模块本记录，其 §1 的作用域键已被本记录改为 connectionId）
 

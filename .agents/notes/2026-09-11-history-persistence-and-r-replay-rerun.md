@@ -1,7 +1,8 @@
 # 决策：AI/R 历史权威源放元库 + R 历史回放改为重新执行
 
+状态：生效
+
 - 日期：2026-09-11
-- 状态：已实施
 - 范围：`prisma/schema.prisma`、`prisma/migrations/20260911193000_analysis_history/`、`src/app/api/history/`、`src/types/history.ts`、`src/lib/history-client.ts`（原 history-store.ts）、`src/lib/r-bridge.ts`、`src/lib/webr-client.ts`、`src/components/r-workbench/r-workbench.tsx`、`src/app/queries/page.tsx`
 - 前序：[统一历史模块与 R 画布](2026-09-11-unified-history-store-and-r-canvas-ownership.md)（§1 的存储介质在此反转）、[统一历史时间线](2026-09-11-unified-history-timeline.md)（其"AI/R 只存浏览器、不跨会话"的边界在此反转）
 
