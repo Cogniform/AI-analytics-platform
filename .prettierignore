@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+.worktrees/
+.artifacts/
+.omo/
+.codegraph/
+.workbuddy/
+src/generated/
+package-lock.json
+tsconfig.tsbuildinfo
+*.md
+*.cmd
+*.bat
