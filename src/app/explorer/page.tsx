@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,37 +24,47 @@ export default function ExplorerPage() {
   const [error, setError] = useState("")
   const previewController = useRef<AbortController | null>(null)
 
+  const fetchSchema = useCallback(
+    async (refresh = false, signal?: AbortSignal) => {
+      if (!connectionId) return
+      setLoading(true)
+      setError("")
+      try {
+        const data = await fetchApi<ApiResponse<SchemaData>>(
+          `/api/schema/${connectionId}${refresh ? "?refresh=true" : ""}`,
+          { ...(signal === undefined ? {} : { signal }) },
+        )
+        if (data.success)
+          setSchema({
+            tables: data.data.tables || [],
+            relations: data.data.relations || [],
+            version: data.data.version,
+          })
+      } catch (requestError) {
+        if (!(requestError instanceof DOMException && requestError.name === "AbortError"))
+          setError(
+            requestError instanceof ApiRequestError ? requestError.message : "Schema 加载失败",
+          )
+      } finally {
+        if (!signal?.aborted) setLoading(false)
+      }
+    },
+    [connectionId],
+  )
+
+  // 请求刻意只随所选连接变化。fetchSchema 由 useCallback 绑住 connectionId，
+  // 所以依赖数组与「只看 connectionId」等价，不再需要 exhaustive-deps 例外。
   useEffect(() => {
     if (!connectionId) return
     const controller = new AbortController()
+    // fetchSchema 会在首个 await 之前同步 setLoading(true)，为的是首帧就显示 loading。
+    // 把它推迟到 await 之后（让本规则满意）会延后 spinner → 属 UI 行为变化，故保留例外。
+    // 试过的拆法：把 setLoading 提到 effect 体内（同样同步、规则照报）、
+    // 用 Promise.resolve().then 包一层（会让 abort 抢先于请求启动，行为变化），都不成立。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchSchema(false, controller.signal)
     return () => controller.abort()
-    // The request is intentionally scoped to the selected connection.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connectionId])
-
-  async function fetchSchema(refresh = false, signal?: AbortSignal) {
-    if (!connectionId) return
-    setLoading(true)
-    setError("")
-    try {
-      const data = await fetchApi<ApiResponse<SchemaData>>(
-        `/api/schema/${connectionId}${refresh ? "?refresh=true" : ""}`,
-        { ...(signal === undefined ? {} : { signal }) },
-      )
-      if (data.success)
-        setSchema({
-          tables: data.data.tables || [],
-          relations: data.data.relations || [],
-          version: data.data.version,
-        })
-    } catch (requestError) {
-      if (!(requestError instanceof DOMException && requestError.name === "AbortError"))
-        setError(requestError instanceof ApiRequestError ? requestError.message : "Schema 加载失败")
-    } finally {
-      if (!signal?.aborted) setLoading(false)
-    }
-  }
+  }, [connectionId, fetchSchema])
 
   async function previewTable(name: string) {
     if (!connectionId) return
