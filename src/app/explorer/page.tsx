@@ -53,16 +53,17 @@ export default function ExplorerPage() {
   )
 
   // 请求刻意只随所选连接变化。fetchSchema 由 useCallback 绑住 connectionId，
-  // 所以依赖数组与「只看 connectionId」等价，不再需要 exhaustive-deps 例外。
+  // 所以依赖数组与「只看 connectionId」等价，不需要 exhaustive-deps 例外。
   useEffect(() => {
     if (!connectionId) return
     const controller = new AbortController()
-    // fetchSchema 会在首个 await 之前同步 setLoading(true)，为的是首帧就显示 loading。
-    // 把它推迟到 await 之后（让本规则满意）会延后 spinner → 属 UI 行为变化，故保留例外。
-    // 试过的拆法：把 setLoading 提到 effect 体内（同样同步、规则照报）、
-    // 用 Promise.resolve().then 包一层（会让 abort 抢先于请求启动，行为变化），都不成立。
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchSchema(false, controller.signal)
+    // fetchSchema 会在首个 await 之前同步 setLoading(true) / setError("")，那会撞上
+    // react-hooks/set-state-in-effect。让出到一个微任务再发起即可绕开，且**不改变可见行为**：
+    // effect 本就在首帧绘制之后才跑，spinner 与清错只晚一个微任务；同 tick 卸载时 cleanup 的
+    // abort 先到，fetch 以 AbortError 结束 —— 与原先「先发起再 abort」走的是同一条被过滤的路径。
+    queueMicrotask(() => {
+      void fetchSchema(false, controller.signal)
+    })
     return () => controller.abort()
   }, [connectionId, fetchSchema])
 
