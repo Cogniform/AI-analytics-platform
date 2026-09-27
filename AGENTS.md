@@ -57,4 +57,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - 开发者手册（目录职责/页面路由/改动路由）：[src/README.md](src/README.md) · 图表算法 [src/components/charts/README.md](src/components/charts/README.md) · 数据层 [prisma/README.md](prisma/README.md)
 - 接口 / AI 合同 / 运行参数：[docs/api.md](docs/api.md) · [docs/ai-integration.md](docs/ai-integration.md) · [docs/operations.md](docs/operations.md)
 - 验证与维护：[docs/verification.md](docs/verification.md) · [docs/maintenance-checklist.md](docs/maintenance-checklist.md) · 进行中计划 [docs/PLAN.md](docs/PLAN.md)
-- 历史留档：[docs/archive/](docs/archive/README.md) · [.agents/notes/archived/](.agents/notes/archived/)
+- 历史留档：[docs/archive/](docs/archive/README.md) · [.agents/notes/](.agents/notes/)
