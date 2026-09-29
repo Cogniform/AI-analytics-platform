@@ -14,3 +14,4 @@ tsconfig.tsbuildinfo
 *.md
 *.cmd
 *.bat
+.pre-commit-config.yaml

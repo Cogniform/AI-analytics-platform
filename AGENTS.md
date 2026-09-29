@@ -15,6 +15,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - 改根 [README.md](README.md) 必须同改 [README_en.md](README_en.md)（冲突时以中文为准）
 
 ## 常用命令
+
+- 本地钩子：`pre-commit install`（每个 clone 一次；本体 `uv tool install pre-commit`）——提交前自动 `prettier --write` + `eslint --fix`（`npx --no-install`，不联网）；CI 只读新增 format:check
 - `npm run verify`（typecheck + lint + test，与 CI 同口径）· `npm run dev`（端口 3000；浏览器脚本默认 4321）
 - `npm run db:init`（幂等初始化/补齐元库）· `npm run db:check`（只读漂移检查）· Node 基线 22（`.node-version`）
 

@@ -35,6 +35,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # 本次新增：Prettier 早已装好并配好（devDependencies 的 prettier +
+      # .prettierrc.json + .prettierignore + package.json 的 format:check 脚本），
+      # 但 workflow 里从没调用过 —— 格式此前只在本地手动跑。
+      - name: Format check
+        run: npm run format:check
+
       - name: Test
         run: npm test
 

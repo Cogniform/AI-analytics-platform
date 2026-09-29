@@ -82,3 +82,23 @@ npm run dev                 # http://localhost:3000
 ## 许可证
 
 [MIT](LICENSE)
+
+---
+
+## 本地提交钩子（pre-commit）
+
+提交前自动修复格式（Prettier）与 lint（ESLint）——只跑秒级检查，且一律走 `npx --no-install`，
+**不联网下载**；typecheck、测试、构建、docs-links 与离线 E2E 留在 [ci.yml](.github/workflows/ci.yml)。
+
+前提：需要 uv 与 pre-commit（pre-commit 用 `uv tool install pre-commit` 装到 `~/.local/bin`）。
+
+```bash
+uv tool install pre-commit
+pre-commit install
+```
+
+> 装完需重开终端（或重载 shell 配置），PATH 才生效。
+
+- 手动全量跑：`pre-commit run --all-files`
+- 跳过单次：`git commit --no-verify`
+- 定义：[.pre-commit-config.yaml](.pre-commit-config.yaml)
