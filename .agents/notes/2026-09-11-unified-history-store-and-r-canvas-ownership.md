@@ -55,7 +55,7 @@
 - `SPLIT_PRESETS.rWorkbenchWidth`（0.43，0.25–0.85，键 `r-workbench-width`）与既有三个预设共用 `SplitHandle` + `useSplitRatio`；
   面板宽度是**像素语义**（420–1200px），由 `ratio × documentElement.clientWidth` 换算 —— 同一句柄，只是比例换成像素解释，不新增组件。
 
-## 被否的备选
+## 替代方案
 
 | 方案 | 否掉的原因 |
 | --- | --- |
