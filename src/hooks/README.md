@@ -9,3 +9,5 @@
 - `useSplitRatio.ts`：可拖拽分割的比例状态（preview 拖拽中 / commit 写盘 / reset 复位），配合 `ui/split-handle`。
 - `__tests__/`：会话 reducer、初始执行、AI 编排与 Hook 契约测试，覆盖范围见 [__tests__/README.md](__tests__/README.md)。
 - 变更影响路由：会话状态改动 → `components/SessionView.tsx`、`components/workspace/` 与对应测试。
+
+- 使用约束与工作偏好 → 见 [AGENTS.md](AGENTS.md)。

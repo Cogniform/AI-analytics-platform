@@ -5,3 +5,5 @@
 - `actions.ts`：会话 reducer Action 联合类型。
 - `history.ts`：统一历史记录契约（AI 提问 / R 执行条目与追加入参，服务端 `analysis_history` 表的对端类型）。
 - 类型契约改动后检查 `hooks/`、`components/`、`app/api/` 和完整测试。
+
+- 使用约束与工作偏好 → 见 [AGENTS.md](AGENTS.md)。

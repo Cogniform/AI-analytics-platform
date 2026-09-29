@@ -10,3 +10,5 @@
 - 基础层惯例：全局 `border-border outline-ring/50`、`:focus-visible` 统一 outline、`prefers-reduced-motion` 归零动画；组件聚焦统一 `focus-visible:border-ring` + `ring-3 ring-ring/50`。
 - 尺寸基调：控件默认 `h-8`，正文 `text-sm` / 次级 `text-xs` / 微级 `text-[10px]`（按钮组、徽标、状态条）；容器描边新式用 `ring-1 ring-foreground/10`，表单控件仍用 `border-input`。
 - 改页面交互后必测：`scripts/offline_workspace_e2e.py`；改 API 后同步 mock 路由。
+
+- 使用约束与工作偏好 → 见 [AGENTS.md](AGENTS.md)。
