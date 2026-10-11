@@ -14,8 +14,12 @@ export function RWorkbenchHeader({ rowCount, colCount, onClose }: RWorkbenchHead
   return (
     <header className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-[var(--border)] bg-[var(--muted)] px-3">
       <div className="min-w-0">
-        <span className="text-xs font-medium text-[var(--foreground)]">R 分析 · df（{rowCount} 行 × {colCount} 列）</span>
-        <span className="ml-2 hidden text-[10px] text-[var(--muted-foreground)] sm:inline">隔离在浏览器沙箱，输出不回写分析会话</span>
+        <span className="text-xs font-medium text-[var(--foreground)]">
+          R 分析 · df（{rowCount} 行 × {colCount} 列）
+        </span>
+        <span className="ml-2 hidden text-[10px] text-[var(--muted-foreground)] sm:inline">
+          隔离在浏览器沙箱，输出不回写分析会话
+        </span>
       </div>
       <Button
         variant="ghost"

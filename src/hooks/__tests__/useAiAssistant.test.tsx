@@ -92,7 +92,9 @@ async function ask(captured: Capture, text: string) {
 }
 
 describe("useAiAssistant", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   afterEach(() => {
     document.body.replaceChildren()
@@ -100,14 +102,20 @@ describe("useAiAssistant", () => {
   })
 
   it("提问成功：记录提问 → INIT_FROM_AI → 对话与通知，并切洞察 Tab", async () => {
-    mocks.fetchApi.mockResolvedValue({ success: true, data: { items: [insight(), insight({ title: "趋势" })] }, requestId: "t" })
+    mocks.fetchApi.mockResolvedValue({
+      success: true,
+      data: { items: [insight(), insight({ title: "趋势" })] },
+      requestId: "t",
+    })
     const { captured, root } = renderAssistant(session())
 
     await ask(captured, "按区域统计 @orders")
 
     expect(captured.actions[0]).toEqual({ type: "ASK_AI", question: "按区域统计 @orders" })
     const init = captured.actions.find((action) => action.type === "INIT_FROM_AI")
-    expect(init).toMatchObject({ payload: { question: "按区域统计 @orders", title: "各区域销售额" } })
+    expect(init).toMatchObject({
+      payload: { question: "按区域统计 @orders", title: "各区域销售额" },
+    })
     expect(captured.actions.some((action) => action.type === "ADD_CONVERSATION")).toBe(true)
     expect(captured.tabs).toEqual(["insights"])
     expect(captured.notices).toEqual(["success:已生成 2 条分析，执行第 1 条"])
@@ -117,7 +125,11 @@ describe("useAiAssistant", () => {
     const [url, init2] = mocks.fetchApi.mock.calls[0] as [string, { body: string }]
     expect(url).toBe("/api/ai")
     const body = JSON.parse(init2.body)
-    expect(body).toMatchObject({ connectionId: "conn-1", conversationId: "session-1", referencedTables: ["orders"] })
+    expect(body).toMatchObject({
+      connectionId: "conn-1",
+      conversationId: "session-1",
+      referencedTables: ["orders"],
+    })
 
     act(() => root.unmount())
   })
@@ -125,14 +137,27 @@ describe("useAiAssistant", () => {
   it("回退项（只有 sql）走 SET_COMPILED_SQL 并回填编辑器草稿", async () => {
     mocks.fetchApi.mockResolvedValue({
       success: true,
-      data: { items: [insight({ querySpec: undefined, displayConfig: undefined, fallback: true, sql: "SELECT 1 AS total", sqlValid: true })] },
+      data: {
+        items: [
+          insight({
+            querySpec: undefined,
+            displayConfig: undefined,
+            fallback: true,
+            sql: "SELECT 1 AS total",
+            sqlValid: true,
+          }),
+        ],
+      },
       requestId: "t",
     })
     const { captured, root } = renderAssistant(session())
 
     await ask(captured, "统计")
 
-    expect(captured.actions).toContainEqual({ type: "SET_COMPILED_SQL", compiledSql: { sql: "SELECT 1 AS total", params: [] } })
+    expect(captured.actions).toContainEqual({
+      type: "SET_COMPILED_SQL",
+      compiledSql: { sql: "SELECT 1 AS total", params: [] },
+    })
     expect(captured.drafts).toEqual(["SELECT 1 AS total"])
 
     act(() => root.unmount())
@@ -152,7 +177,9 @@ describe("useAiAssistant", () => {
   })
 
   it("未配置：标记 unavailable 并给出 .env 指引；卡片执行沿用同一映射", async () => {
-    mocks.fetchApi.mockRejectedValue(Object.assign(new Error("AI 服务未配置：缺少 API Key"), { code: "AI_NOT_CONFIGURED" }))
+    mocks.fetchApi.mockRejectedValue(
+      Object.assign(new Error("AI 服务未配置：缺少 API Key"), { code: "AI_NOT_CONFIGURED" }),
+    )
     const { captured, root } = renderAssistant(session())
 
     await ask(captured, "统计")

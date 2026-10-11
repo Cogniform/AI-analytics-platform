@@ -59,7 +59,9 @@ function parseSchema(source) {
 async function main() {
   const url = process.env.DATABASE_URL
   if (!url) {
-    console.error("缺少 DATABASE_URL：请用 npm run db:check（读 .env），或 node --env-file=<env 文件> scripts/check-db-drift.mjs")
+    console.error(
+      "缺少 DATABASE_URL：请用 npm run db:check（读 .env），或 node --env-file=<env 文件> scripts/check-db-drift.mjs",
+    )
     process.exitCode = 1
     return
   }
@@ -101,14 +103,21 @@ async function main() {
     const missingInvariant = indexRows.length === 0
 
     if (missingTables.length === 0 && missingColumns.length === 0 && !missingInvariant) {
-      console.log("元库结构无漂移：schema.prisma 的 " + models.size + " 个模型在库中均存在（表与列齐全）")
+      console.log(
+        "元库结构无漂移：schema.prisma 的 " + models.size + " 个模型在库中均存在（表与列齐全）",
+      )
       return
     }
     console.error("元库结构与 schema.prisma 不一致：")
     if (missingTables.length) console.error("  缺表：" + missingTables.join(", "))
     if (missingColumns.length) console.error("  缺列：" + missingColumns.join(", "))
-    if (missingInvariant) console.error("  缺索引：schema_snapshots_one_active_per_connection（每连接最多一个 active 快照）")
-    console.error("  修复入口：npm run db:init（幂等补缺失对象）；schema 有新增字段时同时补 prisma/bootstrap.sql 与 prisma/migrations/ 增量补丁")
+    if (missingInvariant)
+      console.error(
+        "  缺索引：schema_snapshots_one_active_per_connection（每连接最多一个 active 快照）",
+      )
+    console.error(
+      "  修复入口：npm run db:init（幂等补缺失对象）；schema 有新增字段时同时补 prisma/bootstrap.sql 与 prisma/migrations/ 增量补丁",
+    )
     process.exitCode = 1
   } catch (error) {
     console.error("漂移检查失败：" + error.message)

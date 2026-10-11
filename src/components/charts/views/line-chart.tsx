@@ -27,8 +27,13 @@ export const LineChartView = React.memo(function LineChartView({
   colorKey?: string | undefined
   showLegend?: boolean
 }) {
-  const sortTemporal = data.length > 0 && data.every((row) => row[xKey] == null || !Number.isNaN(Date.parse(String(row[xKey]))))
-  const transformed = useGroupedData(data, xKey, yKey, colorKey, { sortTemporal, rejectDuplicates: true })
+  const sortTemporal =
+    data.length > 0 &&
+    data.every((row) => row[xKey] == null || !Number.isNaN(Date.parse(String(row[xKey]))))
+  const transformed = useGroupedData(data, xKey, yKey, colorKey, {
+    sortTemporal,
+    rejectDuplicates: true,
+  })
   if (!transformed.ok) return <EmptyState message={transformed.message} />
   const { groups, wideData } = transformed
 

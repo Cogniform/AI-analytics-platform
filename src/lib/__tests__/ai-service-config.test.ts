@@ -38,9 +38,7 @@ describe("default AI provider configuration", () => {
     vi.resetModules()
     const { generateAnalysis } = await import("../ai-service")
 
-    await expect(generateAnalysis("test", "public.items(id integer)")).rejects.toThrow(
-      "AI_MODEL",
-    )
+    await expect(generateAnalysis("test", "public.items(id integer)")).rejects.toThrow("AI_MODEL")
     expect(globalThis.fetch).not.toHaveBeenCalled()
   })
 })

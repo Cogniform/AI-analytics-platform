@@ -25,7 +25,13 @@ export interface ValidationResult {
 
 export type ValidationContext =
   | { mode: "schema"; schema: SchemaData }
-  | { mode: "data"; dataset: { columns: { name: string; semanticType: SemanticType }[]; rows: Record<string, unknown>[] } }
+  | {
+      mode: "data"
+      dataset: {
+        columns: { name: string; semanticType: SemanticType }[]
+        rows: Record<string, unknown>[]
+      }
+    }
 
 const NUMERIC_TYPES = /int|numeric|decimal|real|double|float|serial|money/i
 const TEMPORAL_TYPES = /date|time|timestamp|interval/i
@@ -42,11 +48,26 @@ export function inferSemanticType(name: string, databaseType: string): SemanticT
 
 /** 每种图表必填槽位允许的语义类型（boolean 作为离散分类加入） */
 const REQUIRED_SLOTS: Partial<Record<ChartType, Array<[ChartMappingSlot, SemanticType[]]>>> = {
-  line: [["x", ["temporal", "categorical", "text", "boolean"]], ["y", ["numeric"]]],
-  bar: [["x", ["categorical", "temporal", "text", "boolean"]], ["y", ["numeric"]]],
-  pie: [["name", ["categorical", "text", "temporal", "boolean"]], ["value", ["numeric"]]],
-  scatter: [["x", ["numeric"]], ["y", ["numeric"]]],
-  boxplot: [["category", ["categorical", "text", "boolean"]], ["value", ["numeric"]]],
+  line: [
+    ["x", ["temporal", "categorical", "text", "boolean"]],
+    ["y", ["numeric"]],
+  ],
+  bar: [
+    ["x", ["categorical", "temporal", "text", "boolean"]],
+    ["y", ["numeric"]],
+  ],
+  pie: [
+    ["name", ["categorical", "text", "temporal", "boolean"]],
+    ["value", ["numeric"]],
+  ],
+  scatter: [
+    ["x", ["numeric"]],
+    ["y", ["numeric"]],
+  ],
+  boxplot: [
+    ["category", ["categorical", "text", "boolean"]],
+    ["value", ["numeric"]],
+  ],
   heatmap: [
     ["x", ["categorical", "text", "temporal", "boolean"]],
     ["y", ["categorical", "text", "temporal", "boolean"]],
@@ -90,11 +111,7 @@ function countInvalidNumeric(rows: Record<string, unknown>[], field: string): nu
   return n
 }
 
-function hasDuplicateCoordinate(
-  rows: Record<string, unknown>[],
-  a: string,
-  b?: string,
-): boolean {
+function hasDuplicateCoordinate(rows: Record<string, unknown>[], a: string, b?: string): boolean {
   const seen = new Set<string>()
   return rows.some((row) => {
     const key = JSON.stringify([row[a], b ? row[b] : undefined])

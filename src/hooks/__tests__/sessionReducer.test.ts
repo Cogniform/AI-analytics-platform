@@ -153,10 +153,10 @@ describe("createSessionReducer（无 schema）", () => {
   })
 
   it("ADD_CONVERSATION / SET_QUESTION / CLEAR_ERROR / MARK_USER_MODIFIED / SET_STATUS", () => {
-    const s = reducer(
-      makeSession({ error: "旧错误" }),
-      { type: "ADD_CONVERSATION", message: { role: "assistant", content: "你好", createdAt: new Date() } },
-    )
+    const s = reducer(makeSession({ error: "旧错误" }), {
+      type: "ADD_CONVERSATION",
+      message: { role: "assistant", content: "你好", createdAt: new Date() },
+    })
     expect(s.conversationHistory).toHaveLength(1)
 
     const s2 = reducer(s, { type: "SET_QUESTION", question: "新问题" })
@@ -268,7 +268,9 @@ describe("createSessionReducer（带 schema）", () => {
   it("CHANGE_CHART_TYPE 清除过期 validationIssues", () => {
     const withIssues = makeSession({
       status: "ready",
-      validationIssues: [{ code: "INVALID_NUMERIC", message: "amount 有 1 个无效数值", severity: "warning" }],
+      validationIssues: [
+        { code: "INVALID_NUMERIC", message: "amount 有 1 个无效数值", severity: "warning" },
+      ],
     })
     const next = reducer(withIssues, { type: "CHANGE_CHART_TYPE", chartType: "line" })
     expect(next.displayConfig.chartType).toBe("line")
@@ -278,10 +280,10 @@ describe("createSessionReducer（带 schema）", () => {
 
 describe("missingMappingFields", () => {
   it("返回引用但不存在的字段", () => {
-    const missing = missingMappingFields(
-      { chartType: "bar", x: "customer_name", y: "ghost" },
-      ["customer_name", "amount"],
-    )
+    const missing = missingMappingFields({ chartType: "bar", x: "customer_name", y: "ghost" }, [
+      "customer_name",
+      "amount",
+    ])
     expect(missing).toEqual(["ghost"])
   })
 
@@ -294,10 +296,10 @@ describe("missingMappingFields", () => {
   })
 
   it("全部存在时返回空数组", () => {
-    const missing = missingMappingFields(
-      { chartType: "bar", x: "customer_name", y: "amount" },
-      ["customer_name", "amount"],
-    )
+    const missing = missingMappingFields({ chartType: "bar", x: "customer_name", y: "amount" }, [
+      "customer_name",
+      "amount",
+    ])
     expect(missing).toEqual([])
   })
 })

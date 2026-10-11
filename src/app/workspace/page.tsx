@@ -23,7 +23,9 @@ function WorkspaceRoute() {
 
 export default function WorkspacePage() {
   return (
-    <Suspense fallback={<div className="p-6 text-[var(--muted-foreground)] text-xs">加载中...</div>}>
+    <Suspense
+      fallback={<div className="p-6 text-[var(--muted-foreground)] text-xs">加载中...</div>}
+    >
       <WorkspaceRoute />
     </Suspense>
   )

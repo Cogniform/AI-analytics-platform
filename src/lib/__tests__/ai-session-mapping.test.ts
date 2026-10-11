@@ -35,7 +35,10 @@ describe("buildInitFromAi", () => {
     const payload = buildInitFromAi(item({ sql: "SELECT 1" }), "按区域统计")
 
     expect(payload.querySpec).toEqual({ table: "" })
-    expect(payload.displayConfig).toEqual({ chartType: "bar", mapping: { chartType: "bar", x: "region", y: "total" } })
+    expect(payload.displayConfig).toEqual({
+      chartType: "bar",
+      mapping: { chartType: "bar", x: "region", y: "total" },
+    })
   })
 })
 
@@ -45,12 +48,16 @@ describe("fallbackSqlOf", () => {
   })
 
   it("回退项仅在 SQL 通过只读预检时返回编译结果", () => {
-    expect(fallbackSqlOf(item({ fallback: true, sql: "SELECT 1 AS total", sqlValid: true }))).toEqual({
+    expect(
+      fallbackSqlOf(item({ fallback: true, sql: "SELECT 1 AS total", sqlValid: true })),
+    ).toEqual({
       sql: "SELECT 1 AS total",
       params: [],
     })
     // 未通过只读预检的 SQL 只能复制，不能一键执行
-    expect(fallbackSqlOf(item({ fallback: true, sql: "DELETE FROM orders", sqlValid: false }))).toBeNull()
+    expect(
+      fallbackSqlOf(item({ fallback: true, sql: "DELETE FROM orders", sqlValid: false })),
+    ).toBeNull()
     expect(fallbackSqlOf(item({ fallback: true }))).toBeNull()
   })
 })
@@ -59,8 +66,14 @@ describe("describeAskFailure", () => {
   it("识别未配置错误与普通错误", () => {
     const notConfigured = Object.assign(new Error("缺少 API Key"), { code: "AI_NOT_CONFIGURED" })
 
-    expect(describeAskFailure(notConfigured)).toEqual({ message: "缺少 API Key", notConfigured: true })
-    expect(describeAskFailure(new Error("AI 分析失败：HTTP 500"))).toEqual({ message: "AI 分析失败：HTTP 500", notConfigured: false })
+    expect(describeAskFailure(notConfigured)).toEqual({
+      message: "缺少 API Key",
+      notConfigured: true,
+    })
+    expect(describeAskFailure(new Error("AI 分析失败：HTTP 500"))).toEqual({
+      message: "AI 分析失败：HTTP 500",
+      notConfigured: false,
+    })
     expect(describeAskFailure("boom")).toEqual({ message: "请求失败", notConfigured: false })
   })
 })

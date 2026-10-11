@@ -96,7 +96,10 @@ export function SessionWorkspace({ connectionId, initialSql, rHistoryId }: Sessi
     if (!key || appliedInitialSqlKey.current === key) return
     appliedInitialSqlKey.current = key
     setSqlDraft(sql)
-    dispatch({ type: "UPDATE_DISPLAY_CONFIG", displayConfig: { chartType: "table", mapping: { chartType: "table" } } })
+    dispatch({
+      type: "UPDATE_DISPLAY_CONFIG",
+      displayConfig: { chartType: "table", mapping: { chartType: "table" } },
+    })
     dispatch({ type: "SET_COMPILED_SQL", compiledSql: { sql, params: [] } })
   }, [connectionId, initialSql, dispatch])
 
@@ -133,7 +136,12 @@ export function SessionWorkspace({ connectionId, initialSql, rHistoryId }: Sessi
   // 空会话不写，避免留下无意义快照。
   useEffect(() => {
     if (!connectionId) return
-    if (session.status === "idle" && session.conversationHistory.length === 0 && assistant.insights.length === 0) return
+    if (
+      session.status === "idle" &&
+      session.conversationHistory.length === 0 &&
+      assistant.insights.length === 0
+    )
+      return
     saveWorkspace(connectionId, { session, insights: assistant.insights })
   }, [connectionId, session, assistant.insights])
 
@@ -154,7 +162,11 @@ export function SessionWorkspace({ connectionId, initialSql, rHistoryId }: Sessi
   }
 
   if (!connectionId) {
-    return <div className="p-6 flex items-center justify-center min-h-[50vh] text-[var(--muted-foreground)] text-xs">请先选择数据库连接</div>
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[50vh] text-[var(--muted-foreground)] text-xs">
+        请先选择数据库连接
+      </div>
+    )
   }
 
   return (
@@ -172,87 +184,89 @@ export function SessionWorkspace({ connectionId, initialSql, rHistoryId }: Sessi
       {/* 顶部：标题 + 洞察（执行状态只在结果区头部显示一处） */}
       <div className="min-w-0 px-1 pb-3">
         <div className="text-sm font-medium truncate">{title || "会话工作台"}</div>
-        {insight && <p className="text-xs text-[var(--muted-foreground)] mt-0.5 line-clamp-2">{insight}</p>}
+        {insight && (
+          <p className="text-xs text-[var(--muted-foreground)] mt-0.5 line-clamp-2">{insight}</p>
+        )}
       </div>
 
       {/* 主区：编辑器与中段共享高度，lg 及以上可用分割条调整 */}
       <div ref={workspaceRef} className="flex min-h-0 flex-col lg:min-h-0 lg:flex-1">
-
-      <SqlEditorPanel
-        connectionId={connectionId}
-        sqlDraft={sqlDraft}
-        onDraftChange={setSqlDraft}
-        compiledSql={compiledSql?.sql}
-        busy={busy}
-        onRun={runSql}
-      />
-
-      <SplitHandle
-        axis="y"
-        ratio={editorSplit.ratio}
-        bounds={SPLIT_PRESETS.workspaceEditor.bounds}
-        onPreview={editorSplit.preview}
-        onCommit={editorSplit.commit}
-        onReset={editorSplit.reset}
-        containerRef={workspaceRef}
-        label="调整 SQL 编辑器高度（双击或 Home 复位）"
-        className="hidden lg:flex"
-      />
-
-      {/* 中间：AI 助手 + 结果（lg 及以上可用分割条调整列宽） */}
-      <div
-        ref={columnsRef}
-        className="flex min-h-0 flex-none flex-col gap-3 pt-3 lg:min-h-0 lg:flex-row lg:gap-0 lg:pt-0 lg:overflow-hidden lg:[flex-basis:0] lg:[flex-grow:var(--content-grow)]"
-      >
-        <AiAssistantPanel
-          assistant={assistant}
-          conversationHistory={conversationHistory}
-          schema={schema}
+        <SqlEditorPanel
+          connectionId={connectionId}
+          sqlDraft={sqlDraft}
+          onDraftChange={setSqlDraft}
+          compiledSql={compiledSql?.sql}
           busy={busy}
-          onReset={() => {
-            assistant.clearInsights()
-            dispatch({ type: "RESET" })
-          }}
+          onRun={runSql}
         />
 
         <SplitHandle
-          axis="x"
-          ratio={columnsSplit.ratio}
-          bounds={SPLIT_PRESETS.workspaceColumns.bounds}
-          onPreview={columnsSplit.preview}
-          onCommit={columnsSplit.commit}
-          onReset={columnsSplit.reset}
-          containerRef={columnsRef}
-          thickness={8}
-          label="调整 AI 助手与结果区宽度（双击或 Home 复位）"
+          axis="y"
+          ratio={editorSplit.ratio}
+          bounds={SPLIT_PRESETS.workspaceEditor.bounds}
+          onPreview={editorSplit.preview}
+          onCommit={editorSplit.commit}
+          onReset={editorSplit.reset}
+          containerRef={workspaceRef}
+          label="调整 SQL 编辑器高度（双击或 Home 复位）"
           className="hidden lg:flex"
         />
 
-        {/* 结果（阶段四：SessionView 按状态渲染 loading / error / 图表，并展示警告与调整） */}
-        <div className="flex min-h-[360px] min-w-0 flex-1 flex-col lg:min-h-0 lg:[flex-basis:0] lg:[flex-grow:var(--result-grow)]">
-          <SessionView
-            session={session}
-            connectionId={connectionId}
-            replayRId={rHistoryId || undefined}
-            onMappingChange={handleMappingChange}
-            onCopySql={() => {
-              if (compiledSql?.sql) {
-                navigator.clipboard.writeText(compiledSql.sql)
-                toast("SQL 已复制", "success")
-              }
+        {/* 中间：AI 助手 + 结果（lg 及以上可用分割条调整列宽） */}
+        <div
+          ref={columnsRef}
+          className="flex min-h-0 flex-none flex-col gap-3 pt-3 lg:min-h-0 lg:flex-row lg:gap-0 lg:pt-0 lg:overflow-hidden lg:[flex-basis:0] lg:[flex-grow:var(--content-grow)]"
+        >
+          <AiAssistantPanel
+            assistant={assistant}
+            conversationHistory={conversationHistory}
+            schema={schema}
+            busy={busy}
+            onReset={() => {
+              assistant.clearInsights()
+              dispatch({ type: "RESET" })
             }}
-            insights={assistant.insights}
-            executingInsightIndex={busy ? assistant.executingIndex : null}
-            activeInsightIndex={assistant.activeInsightIndex}
-            insightError={status === "error" && assistant.executingIndex !== null ? error ?? null : null}
-            onExecuteInsight={assistant.execute}
-            tab={resultTab}
-            onTabChange={setResultTab}
           />
-        </div>
+
+          <SplitHandle
+            axis="x"
+            ratio={columnsSplit.ratio}
+            bounds={SPLIT_PRESETS.workspaceColumns.bounds}
+            onPreview={columnsSplit.preview}
+            onCommit={columnsSplit.commit}
+            onReset={columnsSplit.reset}
+            containerRef={columnsRef}
+            thickness={8}
+            label="调整 AI 助手与结果区宽度（双击或 Home 复位）"
+            className="hidden lg:flex"
+          />
+
+          {/* 结果（阶段四：SessionView 按状态渲染 loading / error / 图表，并展示警告与调整） */}
+          <div className="flex min-h-[360px] min-w-0 flex-1 flex-col lg:min-h-0 lg:[flex-basis:0] lg:[flex-grow:var(--result-grow)]">
+            <SessionView
+              session={session}
+              connectionId={connectionId}
+              replayRId={rHistoryId || undefined}
+              onMappingChange={handleMappingChange}
+              onCopySql={() => {
+                if (compiledSql?.sql) {
+                  navigator.clipboard.writeText(compiledSql.sql)
+                  toast("SQL 已复制", "success")
+                }
+              }}
+              insights={assistant.insights}
+              executingInsightIndex={busy ? assistant.executingIndex : null}
+              activeInsightIndex={assistant.activeInsightIndex}
+              insightError={
+                status === "error" && assistant.executingIndex !== null ? (error ?? null) : null
+              }
+              onExecuteInsight={assistant.execute}
+              tab={resultTab}
+              onTabChange={setResultTab}
+            />
+          </div>
         </div>
       </div>
-
     </div>
   )
 }

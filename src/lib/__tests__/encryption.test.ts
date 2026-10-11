@@ -14,9 +14,7 @@ describe("encryption configuration", () => {
     delete process.env.ENCRYPTION_KEY
     vi.resetModules()
 
-    await expect(import("../encryption")).rejects.toThrow(
-      "ENCRYPTION_KEY must be configured",
-    )
+    await expect(import("../encryption")).rejects.toThrow("ENCRYPTION_KEY must be configured")
   })
 
   it("rejects ENCRYPTION_KEY values shorter than 32 characters", async () => {
@@ -48,11 +46,7 @@ describe("encryption configuration", () => {
     vi.resetModules()
     const { decrypt } = await import("../encryption")
     const iv = crypto.randomBytes(16)
-    const cipher = crypto.createCipheriv(
-      "aes-256-gcm",
-      crypto.scryptSync(secret, "salt", 32),
-      iv,
-    )
+    const cipher = crypto.createCipheriv("aes-256-gcm", crypto.scryptSync(secret, "salt", 32), iv)
     const encrypted = cipher.update("legacy-password", "utf8", "hex") + cipher.final("hex")
     const legacyValue = `${iv.toString("hex")}:${cipher.getAuthTag().toString("hex")}:${encrypted}`
 

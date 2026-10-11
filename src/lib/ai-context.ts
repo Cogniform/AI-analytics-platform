@@ -4,7 +4,8 @@
 // 定位与职责（只注入结构与轮廓、永不注入数据行、不做记忆与压缩）见
 // [决策记录](../../.agents/notes/2026-09-11-ai-assistant-contract-and-context.md)。
 
-export type ContextSourceName = "schema" | "dataProfile" | "chartContract" | "businessContext" | "history"
+export type ContextSourceName =
+  "schema" | "dataProfile" | "chartContract" | "businessContext" | "history"
 
 export interface ContextSource {
   name: ContextSourceName
@@ -26,7 +27,8 @@ export const CONTEXT_SOURCES = [
   {
     name: "dataProfile",
     shortLabel: "数据轮廓",
-    label: "数据轮廓（每列唯一值数 / NULL 数 / 最小值 / 最大值 / 样本值；默认前 6 张表，@ 提及的表不受上限）",
+    label:
+      "数据轮廓（每列唯一值数 / NULL 数 / 最小值 / 最大值 / 样本值；默认前 6 张表，@ 提及的表不受上限）",
     fallback: "采集失败静默跳过，不阻断分析",
   },
   {

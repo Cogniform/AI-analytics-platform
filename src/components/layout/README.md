@@ -3,3 +3,5 @@
 - `app-shell.tsx`：侧栏与主内容区域布局。
 - `sidebar.tsx`：页面导航和连接选择入口。
 - `connection-context.tsx`：当前连接上下文。
+
+- 使用约束与工作偏好 → 见 [AGENTS.md](AGENTS.md)。

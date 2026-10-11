@@ -28,11 +28,22 @@ interface InsightCardProps {
   result?: SemanticDataset | null
 }
 
-export function InsightCard({ index, item, sql, onExecute, loading, error, result }: InsightCardProps) {
+export function InsightCard({
+  index,
+  item,
+  sql,
+  onExecute,
+  loading,
+  error,
+  result,
+}: InsightCardProps) {
   const [expanded, setExpanded] = useState(false)
   const sqlText = sql ?? item.sql ?? ""
   const webR = useWebR()
-  const [statOutcome, setStatOutcome] = useState<{ result?: StatTestResult | undefined; message?: string | undefined }>({})
+  const [statOutcome, setStatOutcome] = useState<{
+    result?: StatTestResult | undefined
+    message?: string | undefined
+  }>({})
   // 派生 loading：有 statTest 且结果就绪但尚无结果/错误（状态只在异步链中写入）
   const statRunning = !!item.statTest && !!result && !statOutcome.result && !statOutcome.message
 
@@ -93,11 +104,7 @@ export function InsightCard({ index, item, sql, onExecute, loading, error, resul
             onClick={() => onExecute(item.sql ?? "", item.chart)}
             disabled={loading}
           >
-            {loading ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
-            ) : (
-              <Play className="w-3 h-3" />
-            )}
+            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
             执行
           </Button>
         </div>
@@ -147,7 +154,9 @@ export function InsightCard({ index, item, sql, onExecute, loading, error, resul
       {expanded && (
         <div className="border-t bg-[var(--muted)] px-3 py-2">
           <div className="flex items-center justify-between">
-            <span className="text-[9px] font-medium tracking-wide text-[var(--muted-foreground)]">SQL</span>
+            <span className="text-[9px] font-medium tracking-wide text-[var(--muted-foreground)]">
+              SQL
+            </span>
             {sqlText ? (
               <Button
                 size="sm"
@@ -171,7 +180,11 @@ export function InsightCard({ index, item, sql, onExecute, loading, error, resul
             </p>
           )}
           <div className="mt-1.5 text-[9px] text-[var(--muted-foreground)]">
-            图表: {item.chart.chartType} | 映射: {Object.entries(item.chart).filter(([key]) => key !== "chartType").map(([key, value]) => `${key}=${Array.isArray(value) ? value.join("/") : value}`).join(", ") || "无"}
+            图表: {item.chart.chartType} | 映射:{" "}
+            {Object.entries(item.chart)
+              .filter(([key]) => key !== "chartType")
+              .map(([key, value]) => `${key}=${Array.isArray(value) ? value.join("/") : value}`)
+              .join(", ") || "无"}
           </div>
         </div>
       )}

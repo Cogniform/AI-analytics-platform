@@ -6,3 +6,5 @@
 - `ai/`：AI 分析（自然语言 → 洞察项），详见 [ai/README.md](ai/README.md)。
 - `history/`：统一历史（AI 提问 + R 执行）读写，详见 [history/README.md](history/README.md)。
 - 新增/修改路由后同步 `scripts/offline_workspace_e2e.py` mock。
+
+- 使用约束与工作偏好 → 见 [AGENTS.md](AGENTS.md)。

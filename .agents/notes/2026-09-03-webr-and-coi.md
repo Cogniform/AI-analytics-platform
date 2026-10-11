@@ -1,6 +1,6 @@
 # 决策：WebR 接入与 COI 头（2026-09-03）
 
-已实施：next.config.ts 配置 COOP/COEP；webr@0.6.0 已安装并最小验证通过
+状态：生效 —— next.config.ts 配置 COOP/COEP；webr@0.6.0 已安装并最小验证通过
 
 ## 问题
 

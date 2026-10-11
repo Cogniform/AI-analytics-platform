@@ -37,7 +37,9 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     fetchApi<ApiResponse<Connection>>(`/api/connections/${connectionId}`, {
       signal: controller.signal,
     })
-      .then((data) => setResolved({ id: connectionId, connection: data.success ? data.data : null }))
+      .then((data) =>
+        setResolved({ id: connectionId, connection: data.success ? data.data : null }),
+      )
       .catch((error: unknown) => {
         if (!(error instanceof DOMException && error.name === "AbortError")) {
           setResolved({ id: connectionId, connection: null })

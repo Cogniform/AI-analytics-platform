@@ -11,24 +11,62 @@ interface ChartContract {
 export const CHART_CONTRACTS = {
   table: { required: [], optional: [], description: "原始结果；首次结果默认使用" },
   line: { required: ["x", "y"], optional: ["color"], description: "时间或有序类别趋势" },
-  bar: { required: ["x", "y"], optional: ["fill", "mode"], description: "类别比较；mode 可为 grouped/stacked/normalized" },
+  bar: {
+    required: ["x", "y"],
+    optional: ["fill", "mode"],
+    description: "类别比较；mode 可为 grouped/stacked/normalized",
+  },
   pie: { required: ["name", "value"], optional: [], description: "非负数值的部分占整体" },
   scatter: { required: ["x", "y"], optional: ["color"], description: "两个数值变量的关系" },
   boxplot: { required: ["category", "value"], optional: [], description: "按类别比较数值分布" },
-  heatmap: { required: ["x", "y", "value"], optional: [], description: "两个类别维度与一个已聚合数值" },
-  correlation: { required: [], optional: ["columns", "method"], description: "多个数值列的相关矩阵" },
+  heatmap: {
+    required: ["x", "y", "value"],
+    optional: [],
+    description: "两个类别维度与一个已聚合数值",
+  },
+  correlation: {
+    required: [],
+    optional: ["columns", "method"],
+    description: "多个数值列的相关矩阵",
+  },
   kpi: { required: ["value"], optional: ["label", "comparison"], description: "单行核心指标" },
   histogram: { required: ["value"], optional: ["color"], description: "连续数值分布" },
 } as const satisfies Record<ChartType, ChartContract>
 
 export const CHART_TYPES = Object.keys(CHART_CONTRACTS) as ChartType[]
-export const COLUMN_SLOTS = new Set(["x", "y", "color", "fill", "name", "value", "category", "label", "comparison"])
+export const COLUMN_SLOTS = new Set([
+  "x",
+  "y",
+  "color",
+  "fill",
+  "name",
+  "value",
+  "category",
+  "label",
+  "comparison",
+])
 
 export const MEASURE_AGGREGATIONS: ReadonlySet<string> = new Set([
-  "count", "sum", "avg", "min", "max", "count_distinct",
+  "count",
+  "sum",
+  "avg",
+  "min",
+  "max",
+  "count_distinct",
 ])
 export const FILTER_OPERATORS: ReadonlySet<string> = new Set([
-  "eq", "neq", "gt", "gte", "lt", "lte", "in", "not_in", "contains", "between", "is_null", "is_not_null",
+  "eq",
+  "neq",
+  "gt",
+  "gte",
+  "lt",
+  "lte",
+  "in",
+  "not_in",
+  "contains",
+  "between",
+  "is_null",
+  "is_not_null",
 ])
 
 export interface InsightContext {
@@ -250,7 +288,9 @@ function buildVariantSchema(variant: InsightVariant) {
 /** 提示词里的输出契约段：形状示例、字段说明、变体成员、条数上限都来自同一份声明 */
 function buildContractSection(): string {
   const shape = (variant: InsightVariant) =>
-    `{ "items": [ { ${fieldsOf(variant).map(([name, spec]) => `"${name}": ${spec.example}`).join(", ")} } ] }`
+    `{ "items": [ { ${fieldsOf(variant)
+      .map(([name, spec]) => `"${name}": ${spec.example}`)
+      .join(", ")} } ] }`
   return [
     `- 根对象形状（优先变体）：${shape("querySpec")}`,
     `- 根对象形状（回退变体，仅当无法给出 querySpec 时使用）：${shape("sql")}`,
@@ -284,7 +324,11 @@ export const AI_RESPONSE_JSON_SCHEMA = {
   },
 } as const
 
-export function buildSystemPrompt(schemaContext: string, dataProfileText = "", businessContext = ""): string {
+export function buildSystemPrompt(
+  schemaContext: string,
+  dataProfileText = "",
+  businessContext = "",
+): string {
   const chartRules = CHART_TYPES.map((type) => {
     const contract = CHART_CONTRACTS[type]
     const slots = [...contract.required, ...contract.optional]

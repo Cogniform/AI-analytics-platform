@@ -9,7 +9,13 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { useToast } from "@/components/toast"
 import { fetchApi } from "@/lib/client-api"
 import { Save } from "lucide-react"
@@ -59,7 +65,9 @@ export function SaveQueryControl({ connectionId, sql }: SaveQueryControlProps) {
             <DialogTitle>保存查询</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
-            <Label htmlFor="save-name" className="text-xs">名称</Label>
+            <Label htmlFor="save-name" className="text-xs">
+              名称
+            </Label>
             <Input
               id="save-name"
               value={name}
@@ -70,8 +78,12 @@ export function SaveQueryControl({ connectionId, sql }: SaveQueryControlProps) {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setOpen(false)}>取消</Button>
-            <Button size="sm" onClick={saveQuery} disabled={!name.trim()}>保存</Button>
+            <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
+              取消
+            </Button>
+            <Button size="sm" onClick={saveQuery} disabled={!name.trim()}>
+              保存
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

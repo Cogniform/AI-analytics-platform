@@ -83,24 +83,16 @@ function ChartInner({ mapping, data, showLegend = true, fillHeight = false }: Ch
       if (!mapping.category || !mapping.value) return <EmptyState message="请选择分组和数值字段" />
       return (
         <ChartErrorBoundary chartType="箱线图" resetKeys={[mapping, data]}>
-          <BoxPlotView
-            data={data}
-            xKey={mapping.category}
-            yKey={mapping.value}
-          />
+          <BoxPlotView data={data} xKey={mapping.category} yKey={mapping.value} />
         </ChartErrorBoundary>
       )
     }
     case "heatmap": {
-      if (!mapping.x || !mapping.y || !mapping.value) return <EmptyState message="请选择 X 轴、Y 轴和数值字段" />
+      if (!mapping.x || !mapping.y || !mapping.value)
+        return <EmptyState message="请选择 X 轴、Y 轴和数值字段" />
       return (
         <ChartErrorBoundary chartType="热力图" resetKeys={[mapping, data]}>
-          <HeatmapView
-            data={data}
-            xKey={mapping.x}
-            yKey={mapping.y}
-            fillKey={mapping.value}
-          />
+          <HeatmapView data={data} xKey={mapping.x} yKey={mapping.y} fillKey={mapping.value} />
         </ChartErrorBoundary>
       )
     }
@@ -112,11 +104,24 @@ function ChartInner({ mapping, data, showLegend = true, fillHeight = false }: Ch
       )
     case "histogram": {
       if (!mapping.value) return <EmptyState message="请选择数值字段" />
-      return <ChartErrorBoundary chartType="直方图" resetKeys={[mapping, data]}><HistogramView data={data} valueKey={mapping.value} /></ChartErrorBoundary>
+      return (
+        <ChartErrorBoundary chartType="直方图" resetKeys={[mapping, data]}>
+          <HistogramView data={data} valueKey={mapping.value} />
+        </ChartErrorBoundary>
+      )
     }
     case "kpi": {
       if (!mapping.value) return <EmptyState message="请选择指标值字段" />
-      return <ChartErrorBoundary chartType="指标卡" resetKeys={[mapping, data]}><KpiView data={data} valueKey={mapping.value} labelKey={mapping.label} comparisonKey={mapping.comparison} /></ChartErrorBoundary>
+      return (
+        <ChartErrorBoundary chartType="指标卡" resetKeys={[mapping, data]}>
+          <KpiView
+            data={data}
+            valueKey={mapping.value}
+            labelKey={mapping.label}
+            comparisonKey={mapping.comparison}
+          />
+        </ChartErrorBoundary>
+      )
     }
     case "table":
     default: {

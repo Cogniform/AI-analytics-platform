@@ -21,7 +21,8 @@ export class PoolRegistry<TPool extends ClosablePool> {
   readonly #now: () => number
 
   constructor({ maxEntries, idleMs, now = Date.now }: PoolRegistryOptions) {
-    if (!Number.isInteger(maxEntries) || maxEntries < 1) throw new Error("maxEntries must be a positive integer")
+    if (!Number.isInteger(maxEntries) || maxEntries < 1)
+      throw new Error("maxEntries must be a positive integer")
     if (!Number.isFinite(idleMs) || idleMs < 0) throw new Error("idleMs must be non-negative")
     this.#maxEntries = maxEntries
     this.#idleMs = idleMs
@@ -83,7 +84,7 @@ export class PoolRegistry<TPool extends ClosablePool> {
   async #makeRoom(): Promise<void> {
     while (this.#entries.size >= this.#maxEntries) {
       const oldest = [...this.#entries.entries()].reduce((candidate, entry) =>
-        entry[1].touchedAt < candidate[1].touchedAt ? entry : candidate
+        entry[1].touchedAt < candidate[1].touchedAt ? entry : candidate,
       )
       await this.invalidate(oldest[0])
     }

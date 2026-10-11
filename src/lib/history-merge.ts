@@ -89,7 +89,10 @@ function fromEntry(entry: HistoryEntry): TimelineItem {
  * 合并两来源为一条时间线（新的在前）。
  * createdAt 非法（无法解析为时间）的条目排在末尾，不丢弃。
  */
-export function mergeHistoryTimeline(sqlItems: QueryHistoryItem[], entries: HistoryEntry[]): TimelineItem[] {
+export function mergeHistoryTimeline(
+  sqlItems: QueryHistoryItem[],
+  entries: HistoryEntry[],
+): TimelineItem[] {
   const merged = [...sqlItems.map(fromSql), ...entries.map(fromEntry)]
   return merged.sort((a, b) => {
     const ta = Date.parse(a.createdAt)

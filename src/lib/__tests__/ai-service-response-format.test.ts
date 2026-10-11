@@ -21,16 +21,23 @@ describe("parseResponseFormatChain", () => {
 
 describe("isResponseFormatUnsupported", () => {
   it("识别提供方拒绝 response_format 的错误", () => {
-    const error = Object.assign(new Error("Error from provider (Console Go): Upstream request failed: This response_format type is unavailable now"), {
-      status: 400,
-      type: "invalid_request_error",
-    })
+    const error = Object.assign(
+      new Error(
+        "Error from provider (Console Go): Upstream request failed: This response_format type is unavailable now",
+      ),
+      {
+        status: 400,
+        type: "invalid_request_error",
+      },
+    )
 
     expect(isResponseFormatUnsupported(error)).toBe(true)
   })
 
   it("其他错误不触发降级", () => {
-    expect(isResponseFormatUnsupported(new Error("Request is missing x-opencode-session"))).toBe(false)
+    expect(isResponseFormatUnsupported(new Error("Request is missing x-opencode-session"))).toBe(
+      false,
+    )
     expect(isResponseFormatUnsupported(new Error("Incorrect API key provided"))).toBe(false)
   })
 })

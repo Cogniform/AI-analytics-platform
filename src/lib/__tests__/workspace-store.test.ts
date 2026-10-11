@@ -25,7 +25,12 @@ function dataset(): SemanticDataset {
 }
 
 function insight(): InsightItem {
-  return { title: "各区域销售额", insight: "华东最高", chart: { chartType: "bar" }, fallback: false }
+  return {
+    title: "各区域销售额",
+    insight: "华东最高",
+    chart: { chartType: "bar" },
+    fallback: false,
+  }
 }
 
 function sessionWith(patch: Parameters<typeof createInitialSession>[0] = {}) {
@@ -62,7 +67,10 @@ describe("workspace-store", () => {
   it("恢复不带执行物：compiledSql/querySpec 归零，避免一进工作台就自动重跑", () => {
     const session = createInitialSession({
       compiledSql: { sql: "SELECT 1", params: [] },
-      querySpec: { table: "orders", measures: [{ field: "amount", aggregation: "sum", alias: "total" }] },
+      querySpec: {
+        table: "orders",
+        measures: [{ field: "amount", aggregation: "sum", alias: "total" }],
+      },
     })
 
     saveWorkspace(CONNECTION, { session, insights: [] })
@@ -86,7 +94,10 @@ describe("workspace-store", () => {
   })
 
   it("版本不符、结构损坏、无记录一律返回 null", () => {
-    window.sessionStorage.setItem(workspaceStoreKey(CONNECTION), JSON.stringify({ version: WORKSPACE_STORE_VERSION - 1, session: {}, insights: [] }))
+    window.sessionStorage.setItem(
+      workspaceStoreKey(CONNECTION),
+      JSON.stringify({ version: WORKSPACE_STORE_VERSION - 1, session: {}, insights: [] }),
+    )
     expect(loadWorkspace(CONNECTION)).toBeNull()
 
     window.sessionStorage.setItem(workspaceStoreKey(CONNECTION), "{not json}")

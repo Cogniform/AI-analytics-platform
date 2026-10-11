@@ -63,23 +63,28 @@ export async function executeQuery(
   if (signal?.aborted) throw new DOMException("查询已取消", "AbortError")
 
   const pool = await getPool(connectionId)
-  const boundedTimeout = Math.min(MAX_TIMEOUT_MS, Math.max(1000, Number(timeoutMs) || DEFAULT_TIMEOUT_MS))
+  const boundedTimeout = Math.min(
+    MAX_TIMEOUT_MS,
+    Math.max(1000, Number(timeoutMs) || DEFAULT_TIMEOUT_MS),
+  )
   const client = await pool.connect()
   let invalidateAfterRelease = false
 
   try {
     await client.query("BEGIN")
     await client.query("SET TRANSACTION READ ONLY")
-    await client.query("SELECT set_config('statement_timeout', $1, true)", [String(Math.floor(boundedTimeout))])
+    await client.query("SELECT set_config('statement_timeout', $1, true)", [
+      String(Math.floor(boundedTimeout)),
+    ])
     const backend = await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
     const backendPid = backend.rows[0]?.pid
     if (backendPid === undefined) throw new Error("pg_backend_pid() 未返回行")
     const wrappedSQL = `SELECT * FROM (${validation.sanitizedSQL.trim()}) AS __query_result LIMIT ${MAX_RETURNED_ROWS + 1}`
-    const result = await executeCancelable(
+    const result = (await executeCancelable(
       () => client.query(wrappedSQL),
       () => cancelBackend(pool.options, backendPid),
       signal,
-    ) as PgQueryResult<Record<string, unknown>>
+    )) as PgQueryResult<Record<string, unknown>>
     await client.query("COMMIT")
 
     const truncated = result.rows.length > MAX_RETURNED_ROWS
@@ -122,8 +127,13 @@ export async function testConnection(connectionId: string): Promise<{
       client.release()
     }
   } catch (error) {
-    if (isUnrecoverableConnectionError(error)) await invalidatePool(connectionId).catch(() => undefined)
-    return { success: false, message: "连接失败，请检查数据库地址和只读账号配置", latencyMs: Date.now() - startTime }
+    if (isUnrecoverableConnectionError(error))
+      await invalidatePool(connectionId).catch(() => undefined)
+    return {
+      success: false,
+      message: "连接失败，请检查数据库地址和只读账号配置",
+      latencyMs: Date.now() - startTime,
+    }
   }
 }
 
@@ -138,15 +148,26 @@ async function cancelBackend(config: PoolConfig, backendPid: number): Promise<vo
 }
 
 function isUnrecoverableConnectionError(error: unknown): boolean {
-  const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : ""
+  const code =
+    typeof error === "object" && error !== null && "code" in error ? String(error.code) : ""
   return ["28P01", "28000", "3D000"].includes(code)
 }
 
 function mapPGType(oid: number): string {
   const typeMap: Record<number, string> = {
-    23: "integer", 20: "bigint", 21: "smallint", 1700: "numeric",
-    700: "real", 701: "double precision", 1043: "varchar", 25: "text",
-    16: "boolean", 1114: "timestamp", 1184: "timestamptz", 1082: "date", 1083: "time",
+    23: "integer",
+    20: "bigint",
+    21: "smallint",
+    1700: "numeric",
+    700: "real",
+    701: "double precision",
+    1043: "varchar",
+    25: "text",
+    16: "boolean",
+    1114: "timestamp",
+    1184: "timestamptz",
+    1082: "date",
+    1083: "time",
   }
   return typeMap[oid] || "unknown"
 }

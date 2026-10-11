@@ -20,7 +20,14 @@ interface RWorkbenchBodyProps {
   busy: boolean
 }
 
-export function RWorkbenchBody({ code, onCodeChange, onRun, items, images, busy }: RWorkbenchBodyProps) {
+export function RWorkbenchBody({
+  code,
+  onCodeChange,
+  onRun,
+  items,
+  images,
+  busy,
+}: RWorkbenchBodyProps) {
   const panelSplit = useSplitRatio(
     SPLIT_PRESETS.rWorkbench.key,
     SPLIT_PRESETS.rWorkbench.defaultRatio,
@@ -37,8 +44,12 @@ export function RWorkbenchBody({ code, onCodeChange, onRun, items, images, busy 
         className="flex min-h-[180px] flex-col overflow-hidden rounded-md border border-[var(--border)]"
       >
         <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--muted)] px-2 py-1">
-          <span className="text-[10px] font-medium text-[var(--muted-foreground)]">代码（df 已注入当前结果集）</span>
-          <span className="hidden text-[10px] text-[var(--muted-foreground)] sm:inline">Ctrl+Enter 运行</span>
+          <span className="text-[10px] font-medium text-[var(--muted-foreground)]">
+            代码（df 已注入当前结果集）
+          </span>
+          <span className="hidden text-[10px] text-[var(--muted-foreground)] sm:inline">
+            Ctrl+Enter 运行
+          </span>
         </div>
         <div className="min-h-0 flex-1">
           <RWorkbenchEditor value={code} onChange={onCodeChange} onRun={onRun} />

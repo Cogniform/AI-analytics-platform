@@ -1,6 +1,6 @@
 # 决策：WebR 黑盒统计引擎（2026-09-03）
 
-已实施：蓝图阶段 3 最小可行版已落地（`r-stats.ts` + `WebRClient.runStats` + InsightCard 统计区块）
+状态：生效 —— 蓝图阶段 3 最小可行版已落地（`r-stats.ts` + `WebRClient.runStats` + InsightCard 统计区块）
 
 ## 问题
 

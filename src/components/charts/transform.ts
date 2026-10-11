@@ -8,7 +8,12 @@ export interface ScatterTransform {
 }
 
 export type PieTransform =
-  | { ok: true; slices: Array<{ name: string; value: number }>; mergedCategoryCount: number; categoryLimit: number }
+  | {
+      ok: true
+      slices: Array<{ name: string; value: number }>
+      mergedCategoryCount: number
+      categoryLimit: number
+    }
   | { ok: false; code: "NEGATIVE_VALUE" | "NON_FINITE_VALUE" | "ZERO_TOTAL"; message: string }
 
 export type HeatmapTransform =
@@ -37,7 +42,9 @@ export function prepareGroupedSeries(
   rejectDuplicates = true,
 ): GroupedSeriesTransform {
   const ordered = sortTemporal
-    ? [...rows].sort((left, right) => Date.parse(String(left[xKey])) - Date.parse(String(right[xKey])))
+    ? [...rows].sort(
+        (left, right) => Date.parse(String(left[xKey])) - Date.parse(String(right[xKey])),
+      )
     : rows
   const seen = new Set<string>()
   for (const row of ordered) {
@@ -52,7 +59,8 @@ export function prepareGroupedSeries(
   const groups = unique(ordered.map((row) => String(row[groupKey] ?? "")))
   const xValues = unique(ordered.map((row) => String(row[xKey] ?? "")))
   const values = new Map<string, unknown>()
-  for (const row of ordered) values.set(JSON.stringify([String(row[xKey] ?? ""), String(row[groupKey] ?? "")]), row[yKey])
+  for (const row of ordered)
+    values.set(JSON.stringify([String(row[xKey] ?? ""), String(row[groupKey] ?? "")]), row[yKey])
   const wideData = xValues.map((x) => {
     const row: Record<string, unknown> = { [xKey]: x }
     for (const group of groups) row[group] = values.get(JSON.stringify([x, group])) ?? null
@@ -69,9 +77,18 @@ export function sampleScatterData(
   requestedLimit = 2000,
 ): ScatterTransform {
   const limit = Math.max(1, Math.floor(requestedLimit))
-  const valid = rows.filter((row) => finiteNumber(row[xKey]) !== null && finiteNumber(row[yKey]) !== null)
+  const valid = rows.filter(
+    (row) => finiteNumber(row[xKey]) !== null && finiteNumber(row[yKey]) !== null,
+  )
   if (valid.length <= limit) {
-    return { points: valid, inputCount: rows.length, validCount: valid.length, invalidCount: rows.length - valid.length, sampled: false, limit }
+    return {
+      points: valid,
+      inputCount: rows.length,
+      validCount: valid.length,
+      invalidCount: rows.length - valid.length,
+      sampled: false,
+      limit,
+    }
   }
 
   const groups = new Map<string, Record<string, unknown>[]>()
@@ -83,18 +100,27 @@ export function sampleScatterData(
   }
 
   const allocations = [...groups.entries()].map(([key, points], order) => {
-    const exact = points.length / valid.length * limit
+    const exact = (points.length / valid.length) * limit
     return { key, points, order, count: Math.floor(exact), remainder: exact - Math.floor(exact) }
   })
   let remaining = limit - allocations.reduce((sum, allocation) => sum + allocation.count, 0)
-  for (const allocation of [...allocations].sort((a, b) => b.remainder - a.remainder || a.order - b.order)) {
+  for (const allocation of [...allocations].sort(
+    (a, b) => b.remainder - a.remainder || a.order - b.order,
+  )) {
     if (remaining === 0) break
     allocation.count += 1
     remaining -= 1
   }
 
   const points = allocations.flatMap(({ points: group, count }) => selectEvenly(group, count))
-  return { points, inputCount: rows.length, validCount: valid.length, invalidCount: rows.length - valid.length, sampled: true, limit }
+  return {
+    points,
+    inputCount: rows.length,
+    validCount: valid.length,
+    invalidCount: rows.length - valid.length,
+    sampled: true,
+    limit,
+  }
 }
 
 export function groupPieData(
@@ -107,8 +133,14 @@ export function groupPieData(
   const grouped = new Map<string, number>()
   for (const row of rows) {
     const value = finiteNumber(row[valueKey])
-    if (value === null) return { ok: false, code: "NON_FINITE_VALUE", message: "饼图数值必须是有限数字" }
-    if (value < 0) return { ok: false, code: "NEGATIVE_VALUE", message: "饼图不支持负值，请调整 SQL 或改用其他图表" }
+    if (value === null)
+      return { ok: false, code: "NON_FINITE_VALUE", message: "饼图数值必须是有限数字" }
+    if (value < 0)
+      return {
+        ok: false,
+        code: "NEGATIVE_VALUE",
+        message: "饼图不支持负值，请调整 SQL 或改用其他图表",
+      }
     const name = String(row[nameKey] ?? "未知")
     grouped.set(name, (grouped.get(name) ?? 0) + value)
   }
@@ -152,7 +184,12 @@ export function buildHeatmap(
     const x = String(row[xKey] ?? "")
     const y = String(row[yKey] ?? "")
     const key = JSON.stringify([x, y])
-    if (seenCoordinates.has(key)) return { ok: false, code: "DUPLICATE_COORDINATE", message: "热力图存在重复坐标，请先在 SQL 中聚合" }
+    if (seenCoordinates.has(key))
+      return {
+        ok: false,
+        code: "DUPLICATE_COORDINATE",
+        message: "热力图存在重复坐标，请先在 SQL 中聚合",
+      }
     seenCoordinates.add(key)
     const raw = row[valueKey]
     const value = finiteNumber(raw)
@@ -186,7 +223,7 @@ function selectEvenly<T>(values: T[], count: number): T[] {
   if (count <= 0) return []
   if (count >= values.length) return values
   return Array.from({ length: count }, (_, index) => {
-    const value = values[Math.floor(index * values.length / count)]
+    const value = values[Math.floor((index * values.length) / count)]
     if (value === undefined) throw new Error(`等距抽样越界：count=${count} 长度=${values.length}`)
     return value
   })

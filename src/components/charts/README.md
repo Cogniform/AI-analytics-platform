@@ -36,3 +36,5 @@
 - 直方图的 `mapping.color` 定义后未分发（`index.tsx` 只传 `valueKey`）。
 - 空态高度不统一（histogram 280px，其余 320px）；KPI delta 为 0 时仍显示「↑ 0.0%」。
 - 数据表 End 键滚到底未减视口高度；列宽 localStorage key 随列组合累积。
+
+- 使用约束与工作偏好 → 见 [AGENTS.md](AGENTS.md)。

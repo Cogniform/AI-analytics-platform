@@ -5,7 +5,13 @@ import type { AiHistoryEntry, HistoryEntry, RHistoryEntry } from "@/types/histor
 vi.mock("@/lib/client-api", () => ({ fetchApi: vi.fn() }))
 
 import { fetchApi } from "@/lib/client-api"
-import { appendHistory, importLegacyLocalHistory, listHistory, listRHistory, toPersistedOutput } from "../history-client"
+import {
+  appendHistory,
+  importLegacyLocalHistory,
+  listHistory,
+  listRHistory,
+  toPersistedOutput,
+} from "../history-client"
 
 const fetchMock = vi.mocked(fetchApi)
 
@@ -71,7 +77,16 @@ describe("history-client", () => {
   it("落库走 POST JSON，失败不抛（历史不阻断分析）", async () => {
     fetchMock.mockRejectedValueOnce(new Error("offline"))
 
-    expect(() => appendHistory({ kind: "r", connectionId: "c1", sessionId: "s1", code: "plot(df)", output: [], ok: true })).not.toThrow()
+    expect(() =>
+      appendHistory({
+        kind: "r",
+        connectionId: "c1",
+        sessionId: "s1",
+        code: "plot(df)",
+        output: [],
+        ok: true,
+      }),
+    ).not.toThrow()
     await Promise.resolve()
 
     const firstCall = fetchMock.mock.calls[0]
@@ -79,23 +94,42 @@ describe("history-client", () => {
     const [url, init] = firstCall
     expect(url).toBe("/api/history")
     expect(init?.method).toBe("POST")
-    expect(JSON.parse(String(init?.body))).toMatchObject({ kind: "r", connectionId: "c1", code: "plot(df)" })
+    expect(JSON.parse(String(init?.body))).toMatchObject({
+      kind: "r",
+      connectionId: "c1",
+      code: "plot(df)",
+    })
   })
 
   it("旧浏览器记录一次性导入后删除本地键", async () => {
-    window.localStorage.setItem("analytics-history:v2:c1", JSON.stringify({ version: 2, entries: [aiEntry, rEntry, { kind: "r" }] }))
+    window.localStorage.setItem(
+      "analytics-history:v2:c1",
+      JSON.stringify({ version: 2, entries: [aiEntry, rEntry, { kind: "r" }] }),
+    )
 
     await importLegacyLocalHistory("c1")
 
     expect(fetchMock).toHaveBeenCalledTimes(2)
     const bodies = fetchMock.mock.calls.map(([, init]) => JSON.parse(String(init?.body)))
-    expect(bodies[0]).toMatchObject({ kind: "ai", question: "按区域统计", createdAt: aiEntry.createdAt })
-    expect(bodies[1]).toMatchObject({ kind: "r", code: "summary(df)", imageCount: 1, createdAt: rEntry.createdAt })
+    expect(bodies[0]).toMatchObject({
+      kind: "ai",
+      question: "按区域统计",
+      createdAt: aiEntry.createdAt,
+    })
+    expect(bodies[1]).toMatchObject({
+      kind: "r",
+      code: "summary(df)",
+      imageCount: 1,
+      createdAt: rEntry.createdAt,
+    })
     expect(window.localStorage.getItem("analytics-history:v2:c1")).toBeNull()
   })
 
   it("导入失败保留本地键，下次再试；无本地记录时不发请求", async () => {
-    window.localStorage.setItem("analytics-history:v2:c1", JSON.stringify({ version: 2, entries: [rEntry] }))
+    window.localStorage.setItem(
+      "analytics-history:v2:c1",
+      JSON.stringify({ version: 2, entries: [rEntry] }),
+    )
     fetchMock.mockRejectedValueOnce(new Error("offline"))
 
     await importLegacyLocalHistory("c1")
@@ -108,7 +142,10 @@ describe("history-client", () => {
   })
 
   it("文本输出截断为可持久化行，无输出落空数组", () => {
-    const lines = toPersistedOutput([{ type: "stdout", data: "a\nb" }, { type: "error", data: "oops" }])
+    const lines = toPersistedOutput([
+      { type: "stdout", data: "a\nb" },
+      { type: "error", data: "oops" },
+    ])
 
     expect(lines.join("\n")).toContain("[stdout] a")
     expect(lines.join("\n")).toContain("[error] oops")

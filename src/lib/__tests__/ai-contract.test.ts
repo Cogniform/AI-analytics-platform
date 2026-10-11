@@ -6,29 +6,33 @@ import type { AICompletionProvider } from "../ai-provider"
 
 // 旧格式（回退路径）：仅 sql + chart
 const legacy = JSON.stringify({
-  items: [{
-    title: "区域销售",
-    insight: "比较各区域销售额",
-    sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
-    chart: { type: "bar", mapping: { x: "region", y: "total" } },
-  }],
+  items: [
+    {
+      title: "区域销售",
+      insight: "比较各区域销售额",
+      sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
+      chart: { type: "bar", mapping: { x: "region", y: "total" } },
+    },
+  ],
 })
 
 // 新格式（优先路径）：querySpec + displayConfig（附带 sql 供旧客户端）
 const newFormat = JSON.stringify({
-  items: [{
-    title: "区域销售",
-    insight: "比较各区域销售额",
-    querySpec: {
-      table: "sales",
-      dimensions: ["region"],
-      measures: [{ field: "amount", aggregation: "sum", alias: "total" }],
-      sort: [{ field: "total", direction: "desc" }],
-      limit: 100,
+  items: [
+    {
+      title: "区域销售",
+      insight: "比较各区域销售额",
+      querySpec: {
+        table: "sales",
+        dimensions: ["region"],
+        measures: [{ field: "amount", aggregation: "sum", alias: "total" }],
+        sort: [{ field: "total", direction: "desc" }],
+        limit: 100,
+      },
+      displayConfig: { chartType: "bar", mapping: { x: "region", y: "total" } },
+      sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
     },
-    displayConfig: { chartType: "bar", mapping: { x: "region", y: "total" } },
-    sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
-  }],
+  ],
 })
 
 describe("AI prompt and output contract", () => {
@@ -45,7 +49,10 @@ describe("AI prompt and output contract", () => {
   })
 
   it("injects data profile text when provided", () => {
-    const prompt = buildSystemPrompt("TABLE sales(region text, amount numeric)", "## 数据轮廓\n| 列 | 类型 | 唯一值 |")
+    const prompt = buildSystemPrompt(
+      "TABLE sales(region text, amount numeric)",
+      "## 数据轮廓\n| 列 | 类型 | 唯一值 |",
+    )
     expect(prompt).toContain("数据轮廓")
     expect(prompt).toContain("| 列 | 类型 | 唯一值 |")
     const plain = buildSystemPrompt("TABLE sales(region text, amount numeric)")
@@ -53,7 +60,11 @@ describe("AI prompt and output contract", () => {
   })
 
   it("injects business context when provided and omits the section otherwise", () => {
-    const prompt = buildSystemPrompt("TABLE sales(region text, amount numeric)", "", "高价值客户 = 年消费 > 10 万")
+    const prompt = buildSystemPrompt(
+      "TABLE sales(region text, amount numeric)",
+      "",
+      "高价值客户 = 年消费 > 10 万",
+    )
     expect(prompt).toContain("业务口径（企业上下文")
     expect(prompt).toContain("高价值客户 = 年消费 > 10 万")
     const plain = buildSystemPrompt("TABLE sales(region text, amount numeric)")
@@ -62,15 +73,19 @@ describe("AI prompt and output contract", () => {
 
   it("parses context references from items (new format)", () => {
     const base = JSON.parse(newFormat) as { items: unknown[] }
-    const items = parseInsightItems(JSON.stringify({
-      items: [{
-        ...(base.items[0] as object),
-        context: [
-          { source: "运营规范.pdf", rule: "高价值客户 = 年消费 > 10 万", applied: true },
-          { source: "坏规则", rule: "", applied: false },
+    const items = parseInsightItems(
+      JSON.stringify({
+        items: [
+          {
+            ...(base.items[0] as object),
+            context: [
+              { source: "运营规范.pdf", rule: "高价值客户 = 年消费 > 10 万", applied: true },
+              { source: "坏规则", rule: "", applied: false },
+            ],
+          },
         ],
-      }],
-    }))
+      }),
+    )
     expect(items).toHaveLength(1)
     expect(indexed(items, 0).context).toEqual([
       { source: "运营规范.pdf", rule: "高价值客户 = 年消费 > 10 万", applied: true },
@@ -81,9 +96,11 @@ describe("AI prompt and output contract", () => {
   it("omits context when absent or empty", () => {
     expect(indexed(parseInsightItems(newFormat), 0).context).toBeUndefined()
     const base = JSON.parse(newFormat) as { items: unknown[] }
-    const withEmpty = parseInsightItems(JSON.stringify({
-      items: [{ ...(base.items[0] as object), context: [] }],
-    }))
+    const withEmpty = parseInsightItems(
+      JSON.stringify({
+        items: [{ ...(base.items[0] as object), context: [] }],
+      }),
+    )
     expect(indexed(withEmpty, 0).context).toBeUndefined()
   })
 
@@ -115,22 +132,27 @@ describe("AI prompt and output contract", () => {
         sort: [{ field: "total", direction: "desc" }],
         limit: 100,
       },
-      displayConfig: { chartType: "bar", mapping: { chartType: "bar", x: "region", y: "total", mode: "grouped" } },
+      displayConfig: {
+        chartType: "bar",
+        mapping: { chartType: "bar", x: "region", y: "total", mode: "grouped" },
+      },
       chart: { chartType: "bar", x: "region", y: "total", mode: "grouped" },
       sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
     })
   })
 
   it("parses the legacy sql + chart format into a fallback item", () => {
-    expect(parseInsightItems(legacy)).toEqual([{
-      title: "区域销售",
-      insight: "比较各区域销售额",
-      sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
-      sqlValid: true,
-      chart: { chartType: "bar", x: "region", y: "total", mode: "grouped" },
-      displayConfig: undefined,
-      fallback: true,
-    }])
+    expect(parseInsightItems(legacy)).toEqual([
+      {
+        title: "区域销售",
+        insight: "比较各区域销售额",
+        sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
+        sqlValid: true,
+        chart: { chartType: "bar", x: "region", y: "total", mode: "grouped" },
+        displayConfig: undefined,
+        fallback: true,
+      },
+    ])
   })
 
   it.each([
@@ -162,7 +184,9 @@ describe("AI prompt and output contract", () => {
     parsed.items[0].querySpec = { dimensions: ["region"] } // 缺 table
     const item = indexed(parseInsightItems(JSON.stringify(parsed)), 0)
     expect(item.fallback).toBe(true)
-    expect(item.sql).toBe("SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region")
+    expect(item.sql).toBe(
+      "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
+    )
   })
 
   it("uses an injected provider and requests native structured output", async () => {
@@ -174,7 +198,12 @@ describe("AI prompt and output contract", () => {
       },
     }
 
-    const result = await generateAnalysis("比较区域", "TABLE sales(region text, amount numeric)", [], provider)
+    const result = await generateAnalysis(
+      "比较区域",
+      "TABLE sales(region text, amount numeric)",
+      [],
+      provider,
+    )
 
     expect(result.items).toHaveLength(1)
     expect(indexed(result.items, 0).fallback).toBe(false)

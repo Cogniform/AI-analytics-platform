@@ -59,7 +59,10 @@ describe("WebRClient", () => {
         constructed += 1
       }
     }
-    return { client: new WebRClient({ WebRImpl: FakeWebR as unknown as typeof WebR }), constructed: () => constructed }
+    return {
+      client: new WebRClient({ WebRImpl: FakeWebR as unknown as typeof WebR }),
+      constructed: () => constructed,
+    }
   }
 
   beforeEach(() => {
@@ -102,7 +105,11 @@ describe("WebRClient", () => {
     expect(client.getState().lastImageCount).toBe(1)
     expect(client.getState().images).toHaveLength(1)
 
-    fake.shelter.captureR.mockResolvedValueOnce({ result: {}, output: [{ type: "stdout", data: "ok" }], images: [] })
+    fake.shelter.captureR.mockResolvedValueOnce({
+      result: {},
+      output: [{ type: "stdout", data: "ok" }],
+      images: [],
+    })
     await client.execute("summary(df)")
     expect(client.getState().lastImageCount).toBe(0)
     // 累积展示不回退：上一张图仍在输出区
@@ -143,7 +150,11 @@ describe("WebRClient", () => {
   it("reportError appends an error output item", async () => {
     const { client } = makeClient()
     client.reportError("boot failed: no network")
-    expect(client.getState().output.some((o) => o.type === "error" && o.data === "boot failed: no network")).toBe(true)
+    expect(
+      client
+        .getState()
+        .output.some((o) => o.type === "error" && o.data === "boot failed: no network"),
+    ).toBe(true)
   })
 
   it("runStats returns captured stdout without touching the output area", async () => {
@@ -157,7 +168,10 @@ describe("WebRClient", () => {
     const out = await client.runStats("x <- c(1, 2)")
     expect(out).toBe("P_VALUE=0.03|STAT=2.1|N=50")
     expect(client.getState().output).toHaveLength(0)
-    expect(fake.shelter.captureR).toHaveBeenCalledWith("x <- c(1, 2)", expect.objectContaining({ withAutoprint: false }))
+    expect(fake.shelter.captureR).toHaveBeenCalledWith(
+      "x <- c(1, 2)",
+      expect.objectContaining({ withAutoprint: false }),
+    )
   })
 
   it("runStats before init throws", async () => {
@@ -192,10 +206,13 @@ describe("WebRClient", () => {
     await client.init()
     const large: SemanticDataset = {
       ...smallDataset,
-      rows: Array.from({ length: Math.ceil(INJECT_CELL_THRESHOLD / smallDataset.columns.length) + 1 }, (_, i) => ({
-        sales: i,
-        region: "A",
-      })),
+      rows: Array.from(
+        { length: Math.ceil(INJECT_CELL_THRESHOLD / smallDataset.columns.length) + 1 },
+        (_, i) => ({
+          sales: i,
+          region: "A",
+        }),
+      ),
     }
     await client.injectData(large)
     expect(client.getState().output.some((o) => o.type === "warning")).toBe(true)

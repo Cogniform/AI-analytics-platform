@@ -9,7 +9,9 @@ function Broken({ fail }: { fail: boolean }) {
 }
 
 describe("ChartErrorBoundary", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   afterEach(() => {
     document.body.replaceChildren()
@@ -22,11 +24,23 @@ describe("ChartErrorBoundary", () => {
     document.body.appendChild(container)
     const root = createRoot(container)
 
-    await act(async () => root.render(<ChartErrorBoundary chartType="测试" resetKeys={["bad"]}><Broken fail /></ChartErrorBoundary>))
+    await act(async () =>
+      root.render(
+        <ChartErrorBoundary chartType="测试" resetKeys={["bad"]}>
+          <Broken fail />
+        </ChartErrorBoundary>,
+      ),
+    )
     expect(container.textContent).toContain("测试图表渲染失败")
     expect(container.textContent).not.toContain("sensitive details")
 
-    await act(async () => root.render(<ChartErrorBoundary chartType="测试" resetKeys={["good"]}><Broken fail={false} /></ChartErrorBoundary>))
+    await act(async () =>
+      root.render(
+        <ChartErrorBoundary chartType="测试" resetKeys={["good"]}>
+          <Broken fail={false} />
+        </ChartErrorBoundary>,
+      ),
+    )
     expect(container.textContent).toContain("chart recovered")
     await act(async () => root.unmount())
   })

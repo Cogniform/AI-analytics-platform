@@ -12,7 +12,9 @@ export interface XYChartProps {
   yKey: string
 }
 
-interface LegendOptions { showLegend?: boolean }
+interface LegendOptions {
+  showLegend?: boolean
+}
 
 /**
  * 图表映射槽位全部允许显式 undefined：
@@ -20,14 +22,50 @@ interface LegendOptions { showLegend?: boolean }
  * 消费处 charts/index.tsx 一律用真值判断分派，槽位取值为 undefined 与键不存在同义。
  */
 export type ChartMapping =
-  | ({ chartType: "line"; x?: string | undefined; y?: string | undefined; color?: string | undefined } & LegendOptions)
-  | ({ chartType: "bar"; x?: string | undefined; y?: string | undefined; fill?: string | undefined; mode?: "grouped" | "stacked" | "normalized" | undefined } & LegendOptions)
-  | { chartType: "pie"; name?: string | undefined; value?: string | undefined; categoryLimit?: number | undefined }
-  | ({ chartType: "scatter"; x?: string | undefined; y?: string | undefined; color?: string | undefined; pointLimit?: number | undefined } & LegendOptions)
+  | ({
+      chartType: "line"
+      x?: string | undefined
+      y?: string | undefined
+      color?: string | undefined
+    } & LegendOptions)
+  | ({
+      chartType: "bar"
+      x?: string | undefined
+      y?: string | undefined
+      fill?: string | undefined
+      mode?: "grouped" | "stacked" | "normalized" | undefined
+    } & LegendOptions)
+  | {
+      chartType: "pie"
+      name?: string | undefined
+      value?: string | undefined
+      categoryLimit?: number | undefined
+    }
+  | ({
+      chartType: "scatter"
+      x?: string | undefined
+      y?: string | undefined
+      color?: string | undefined
+      pointLimit?: number | undefined
+    } & LegendOptions)
   | { chartType: "boxplot"; category?: string | undefined; value?: string | undefined }
-  | { chartType: "heatmap"; x?: string | undefined; y?: string | undefined; value?: string | undefined }
-  | { chartType: "correlation"; columns?: string[] | undefined; method?: CorrelationMethod | undefined }
-  | { chartType: "kpi"; value?: string | undefined; label?: string | undefined; comparison?: string | undefined }
+  | {
+      chartType: "heatmap"
+      x?: string | undefined
+      y?: string | undefined
+      value?: string | undefined
+    }
+  | {
+      chartType: "correlation"
+      columns?: string[] | undefined
+      method?: CorrelationMethod | undefined
+    }
+  | {
+      chartType: "kpi"
+      value?: string | undefined
+      label?: string | undefined
+      comparison?: string | undefined
+    }
   | { chartType: "histogram"; value?: string | undefined; color?: string | undefined }
   | { chartType: "table" }
 

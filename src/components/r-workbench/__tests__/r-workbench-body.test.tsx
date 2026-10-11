@@ -66,7 +66,9 @@ async function render(props: React.ComponentProps<typeof RWorkbenchBody>) {
 }
 
 describe("RWorkbenchBody", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   beforeEach(() => {
     seen.editor = null

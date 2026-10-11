@@ -22,10 +22,13 @@ describe("API route response contract", () => {
 
   it("uses the shared discriminated response type in client callers", () => {
     const roots = ["src/app", "src/components"]
-    const source = roots.flatMap((root) => readdirSync(resolve(process.cwd(), root), { recursive: true })
-      .map(String)
-      .filter((path) => /\.tsx?$/.test(path))
-      .map((path) => readFileSync(resolve(process.cwd(), root, path), "utf8")))
+    const source = roots
+      .flatMap((root) =>
+        readdirSync(resolve(process.cwd(), root), { recursive: true })
+          .map(String)
+          .filter((path) => /\.tsx?$/.test(path))
+          .map((path) => readFileSync(resolve(process.cwd(), root, path), "utf8")),
+      )
       .join("\n")
 
     expect(source).not.toMatch(/fetchApi<\{\s*success:\s*boolean/)

@@ -47,9 +47,18 @@ export default function Home() {
   useEffect(() => {
     const controller = new AbortController()
     fetchApi<ApiResponse<Connection[]>>("/api/connections", { signal: controller.signal }, 8000)
-      .then((d) => { if (d.success) setConnections(d.data) })
-      .catch((requestError) => { if (!(requestError instanceof DOMException && requestError.name === "AbortError")) setListError(requestError instanceof ApiRequestError ? requestError.message : "连接列表加载失败") })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false) })
+      .then((d) => {
+        if (d.success) setConnections(d.data)
+      })
+      .catch((requestError) => {
+        if (!(requestError instanceof DOMException && requestError.name === "AbortError"))
+          setListError(
+            requestError instanceof ApiRequestError ? requestError.message : "连接列表加载失败",
+          )
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false)
+      })
     return () => controller.abort()
   }, [])
 
@@ -80,7 +89,9 @@ export default function Home() {
   async function handleDelete(id: string) {
     if (!confirm("确定删除？")) return
     try {
-      const data = await fetchApi<ApiResponse<{ deleted: boolean }>>(`/api/connections/${id}`, { method: "DELETE" })
+      const data = await fetchApi<ApiResponse<{ deleted: boolean }>>(`/api/connections/${id}`, {
+        method: "DELETE",
+      })
       if (data.success) refresh()
     } catch (requestError) {
       setListError(requestError instanceof ApiRequestError ? requestError.message : "删除连接失败")
@@ -90,8 +101,14 @@ export default function Home() {
   function refresh() {
     setListError("")
     fetchApi<ApiResponse<Connection[]>>("/api/connections", {}, 8000)
-      .then((d) => { if (d.success) setConnections(d.data) })
-      .catch((requestError) => setListError(requestError instanceof ApiRequestError ? requestError.message : "连接列表加载失败"))
+      .then((d) => {
+        if (d.success) setConnections(d.data)
+      })
+      .catch((requestError) =>
+        setListError(
+          requestError instanceof ApiRequestError ? requestError.message : "连接列表加载失败",
+        ),
+      )
   }
 
   async function openEdit(conn: Connection) {
@@ -130,9 +147,18 @@ export default function Home() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-base font-semibold text-[var(--foreground)]">连接管理</h1>
-        <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">选择或创建 PostgreSQL 数据库连接</p>
+        <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
+          选择或创建 PostgreSQL 数据库连接
+        </p>
       </div>
-      {listError && <div className="mb-4 flex items-center justify-between rounded-md border border-[var(--destructive-border)] bg-[var(--destructive-surface)] px-3 py-2 text-xs text-[var(--destructive)]"><span>{listError}</span><Button variant="ghost" size="sm" className="h-6 text-xs" onClick={refresh}>重试</Button></div>}
+      {listError && (
+        <div className="mb-4 flex items-center justify-between rounded-md border border-[var(--destructive-border)] bg-[var(--destructive-surface)] px-3 py-2 text-xs text-[var(--destructive)]">
+          <span>{listError}</span>
+          <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={refresh}>
+            重试
+          </Button>
+        </div>
+      )}
 
       {/* Connection List */}
       {loading ? (
@@ -144,7 +170,17 @@ export default function Home() {
           </div>
           <p className="mb-1 text-sm text-[var(--foreground)]">暂无数据库连接</p>
           <p className="mb-4 text-xs text-[var(--muted-foreground)]">点击下方按钮创建第一个连接</p>
-          <Dialog open={dialogOpen} onOpenChange={(v) => { setDialogOpen(v); if (!v) { setEditingId(null); setForm(defaultForm); setError("") } }}>
+          <Dialog
+            open={dialogOpen}
+            onOpenChange={(v) => {
+              setDialogOpen(v)
+              if (!v) {
+                setEditingId(null)
+                setForm(defaultForm)
+                setError("")
+              }
+            }}
+          >
             <DialogTrigger className="inline-flex h-8 items-center justify-center rounded-md bg-[var(--primary)] px-3 text-xs font-medium text-[var(--primary-foreground)] transition-colors hover:opacity-90">
               <Plus className="w-3.5 h-3.5 mr-1" />
               新建连接
@@ -155,21 +191,57 @@ export default function Home() {
                 <DialogDescription>填写 PostgreSQL 连接信息</DialogDescription>
               </DialogHeader>
               <div className="space-y-3 py-2">
-                <Field label="名称" value={form.name} onChange={(v) => setForm({ ...form, name: v })} placeholder="生产数据库" />
-                <Field label="描述" value={form.description} onChange={(v) => setForm({ ...form, description: v })} placeholder="可选" />
+                <Field
+                  label="名称"
+                  value={form.name}
+                  onChange={(v) => setForm({ ...form, name: v })}
+                  placeholder="生产数据库"
+                />
+                <Field
+                  label="描述"
+                  value={form.description}
+                  onChange={(v) => setForm({ ...form, description: v })}
+                  placeholder="可选"
+                />
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="主机" value={form.host} onChange={(v) => setForm({ ...form, host: v })} />
-                  <Field label="端口" value={String(form.port)} onChange={(v) => setForm({ ...form, port: Number(v) })} type="number" />
+                  <Field
+                    label="主机"
+                    value={form.host}
+                    onChange={(v) => setForm({ ...form, host: v })}
+                  />
+                  <Field
+                    label="端口"
+                    value={String(form.port)}
+                    onChange={(v) => setForm({ ...form, port: Number(v) })}
+                    type="number"
+                  />
                 </div>
-                <Field label="数据库" value={form.database} onChange={(v) => setForm({ ...form, database: v })} placeholder="mydb" />
+                <Field
+                  label="数据库"
+                  value={form.database}
+                  onChange={(v) => setForm({ ...form, database: v })}
+                  placeholder="mydb"
+                />
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="用户名" value={form.username} onChange={(v) => setForm({ ...form, username: v })} />
-                  <Field label="密码" value={form.password} onChange={(v) => setForm({ ...form, password: v })} type="password" placeholder={editingId ? "留空则不修改" : undefined} />
+                  <Field
+                    label="用户名"
+                    value={form.username}
+                    onChange={(v) => setForm({ ...form, username: v })}
+                  />
+                  <Field
+                    label="密码"
+                    value={form.password}
+                    onChange={(v) => setForm({ ...form, password: v })}
+                    type="password"
+                    placeholder={editingId ? "留空则不修改" : undefined}
+                  />
                 </div>
                 {error && <p className="text-xs text-[var(--destructive)]">{error}</p>}
               </div>
               <DialogFooter>
-                <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>取消</Button>
+                <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>
+                  取消
+                </Button>
                 <Button size="sm" onClick={handleSubmit} disabled={submitting}>
                   {submitting ? "保存中..." : "保存"}
                 </Button>
@@ -192,7 +264,9 @@ export default function Home() {
                   <Database className="h-4 w-4 text-[var(--muted-foreground)]" />
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-[var(--foreground)]">{conn.name}</div>
+                  <div className="truncate text-sm font-medium text-[var(--foreground)]">
+                    {conn.name}
+                  </div>
                   <div className="truncate text-xs text-[var(--muted-foreground)]">
                     {conn.host}:{conn.port}/{conn.database}
                     {conn.tableCount ? ` · ${conn.tableCount} 表` : ""}
@@ -209,10 +283,23 @@ export default function Home() {
                   进入
                   <ArrowRight className="w-3 h-3 ml-1" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" aria-label="编辑连接" onClick={() => openEdit(conn)} disabled={loadingDetail}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  aria-label="编辑连接"
+                  onClick={() => openEdit(conn)}
+                  disabled={loadingDetail}
+                >
                   <Pencil className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-[var(--muted-foreground)] hover:text-[var(--destructive)]" aria-label="删除连接" onClick={() => handleDelete(conn.id)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-[var(--muted-foreground)] hover:text-[var(--destructive)]"
+                  aria-label="删除连接"
+                  onClick={() => handleDelete(conn.id)}
+                >
                   <Trash2 className="w-3 h-3" />
                 </Button>
               </div>
@@ -220,7 +307,17 @@ export default function Home() {
           ))}
 
           {/* Add new */}
-          <Dialog open={dialogOpen} onOpenChange={(v) => { setDialogOpen(v); if (!v) { setEditingId(null); setForm(defaultForm); setError("") } }}>
+          <Dialog
+            open={dialogOpen}
+            onOpenChange={(v) => {
+              setDialogOpen(v)
+              if (!v) {
+                setEditingId(null)
+                setForm(defaultForm)
+                setError("")
+              }
+            }}
+          >
             <DialogTrigger className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] p-2.5 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--ring)] hover:text-[var(--foreground)]">
               <Plus className="w-3.5 h-3.5" />
               新建连接
@@ -231,21 +328,57 @@ export default function Home() {
                 <DialogDescription>填写 PostgreSQL 连接信息</DialogDescription>
               </DialogHeader>
               <div className="space-y-3 py-2">
-                <Field label="名称" value={form.name} onChange={(v) => setForm({ ...form, name: v })} placeholder="生产数据库" />
-                <Field label="描述" value={form.description} onChange={(v) => setForm({ ...form, description: v })} placeholder="可选" />
+                <Field
+                  label="名称"
+                  value={form.name}
+                  onChange={(v) => setForm({ ...form, name: v })}
+                  placeholder="生产数据库"
+                />
+                <Field
+                  label="描述"
+                  value={form.description}
+                  onChange={(v) => setForm({ ...form, description: v })}
+                  placeholder="可选"
+                />
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="主机" value={form.host} onChange={(v) => setForm({ ...form, host: v })} />
-                  <Field label="端口" value={String(form.port)} onChange={(v) => setForm({ ...form, port: Number(v) })} type="number" />
+                  <Field
+                    label="主机"
+                    value={form.host}
+                    onChange={(v) => setForm({ ...form, host: v })}
+                  />
+                  <Field
+                    label="端口"
+                    value={String(form.port)}
+                    onChange={(v) => setForm({ ...form, port: Number(v) })}
+                    type="number"
+                  />
                 </div>
-                <Field label="数据库" value={form.database} onChange={(v) => setForm({ ...form, database: v })} placeholder="mydb" />
+                <Field
+                  label="数据库"
+                  value={form.database}
+                  onChange={(v) => setForm({ ...form, database: v })}
+                  placeholder="mydb"
+                />
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="用户名" value={form.username} onChange={(v) => setForm({ ...form, username: v })} />
-                  <Field label="密码" value={form.password} onChange={(v) => setForm({ ...form, password: v })} type="password" placeholder={editingId ? "留空则不修改" : undefined} />
+                  <Field
+                    label="用户名"
+                    value={form.username}
+                    onChange={(v) => setForm({ ...form, username: v })}
+                  />
+                  <Field
+                    label="密码"
+                    value={form.password}
+                    onChange={(v) => setForm({ ...form, password: v })}
+                    type="password"
+                    placeholder={editingId ? "留空则不修改" : undefined}
+                  />
                 </div>
                 {error && <p className="text-xs text-[var(--destructive)]">{error}</p>}
               </div>
               <DialogFooter>
-                <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>取消</Button>
+                <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>
+                  取消
+                </Button>
                 <Button size="sm" onClick={handleSubmit} disabled={submitting}>
                   {submitting ? "保存中..." : "保存"}
                 </Button>
@@ -258,7 +391,13 @@ export default function Home() {
   )
 }
 
-function Field({ label, value, onChange, type = "text", placeholder }: {
+function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+}: {
   label: string
   value: string
   onChange: (v: string) => void
@@ -268,7 +407,9 @@ function Field({ label, value, onChange, type = "text", placeholder }: {
   const id = useId()
   return (
     <div className="space-y-1">
-      <Label htmlFor={id} className="text-xs">{label}</Label>
+      <Label htmlFor={id} className="text-xs">
+        {label}
+      </Label>
       <Input
         id={id}
         value={value}

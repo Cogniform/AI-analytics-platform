@@ -9,7 +9,10 @@ import {
 
 describe("normalizeReferencedTables", () => {
   it("去空、去重、保持顺序", () => {
-    expect(normalizeReferencedTables([" orders ", "orders", "", "customers", 7, null])).toEqual(["orders", "customers"])
+    expect(normalizeReferencedTables([" orders ", "orders", "", "customers", 7, null])).toEqual([
+      "orders",
+      "customers",
+    ])
   })
 
   it("非数组一律视为未提及", () => {

@@ -5,7 +5,10 @@ import type { QueryResult } from "@/types"
 import { ResultPanel } from "../result-panel"
 
 vi.mock("@/components/chart-config-panel", () => ({
-  ChartConfigPanel: ({ mapping, onChange }: {
+  ChartConfigPanel: ({
+    mapping,
+    onChange,
+  }: {
     mapping: { chartType: string }
     onChange: (mapping: { chartType: string }) => void
   }) => (
@@ -29,7 +32,9 @@ const result: QueryResult = {
 }
 
 describe("ResultPanel", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   afterEach(() => {
     document.body.replaceChildren()

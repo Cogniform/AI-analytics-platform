@@ -36,15 +36,25 @@ describe("buildStatTestCode", () => {
   })
 
   it("builds cor and chisq templates", () => {
-    const cor = buildStatTestCode(dataset, { kind: "cor", x: "sales", y: "region", hypothesis: "h" })
+    const cor = buildStatTestCode(dataset, {
+      kind: "cor",
+      x: "sales",
+      y: "region",
+      hypothesis: "h",
+    })
     expect(cor).toContain("cor.test(x, y")
-    const chi = buildStatTestCode(dataset, { kind: "chisq", x: "sales", y: "region", hypothesis: "h" })
+    const chi = buildStatTestCode(dataset, {
+      kind: "chisq",
+      x: "sales",
+      y: "region",
+      hypothesis: "h",
+    })
     expect(chi).toContain("chisq.test(x, y)")
   })
 
   it("throws when a column is missing", () => {
     expect(() =>
-      buildStatTestCode(dataset, { kind: "ttest", x: "nope", y: "region", hypothesis: "h" })
+      buildStatTestCode(dataset, { kind: "ttest", x: "nope", y: "region", hypothesis: "h" }),
     ).toThrow("统计检验列不存在")
   })
 
@@ -82,16 +92,22 @@ describe("parseStatTestOutput", () => {
 describe("summarizeStatTest", () => {
   it("states significance for p < 0.05", () => {
     expect(
-      summarizeStatTest({ kind: "ttest", pValue: 0.03, statistic: 2.3, detail: "", sampleSize: 50 })
+      summarizeStatTest({
+        kind: "ttest",
+        pValue: 0.03,
+        statistic: 2.3,
+        detail: "",
+        sampleSize: 50,
+      }),
     ).toContain("存在显著差异")
   })
 
   it("states no significance for p >= 0.05", () => {
     expect(
-      summarizeStatTest({ kind: "cor", pValue: 0.2, statistic: 0.1, detail: "", sampleSize: 50 })
+      summarizeStatTest({ kind: "cor", pValue: 0.2, statistic: 0.1, detail: "", sampleSize: 50 }),
     ).toContain("未发现显著相关")
-    expect(summarizeStatTest({ kind: "chisq", pValue: 0.6, statistic: 1.2, detail: "", sampleSize: 50 })).toContain(
-      "未发现显著关联"
-    )
+    expect(
+      summarizeStatTest({ kind: "chisq", pValue: 0.6, statistic: 1.2, detail: "", sampleSize: 50 }),
+    ).toContain("未发现显著关联")
   })
 })

@@ -57,7 +57,8 @@ export function SplitHandle({
     const usable = (axis === "y" ? rect.height : rect.width) - thickness
     const move = (pointerEvent: PointerEvent) => {
       if (usable <= 0) return
-      const offset = axis === "y" ? pointerEvent.clientY - rect.top : pointerEvent.clientX - rect.left
+      const offset =
+        axis === "y" ? pointerEvent.clientY - rect.top : pointerEvent.clientX - rect.left
       const position = offset / usable
       onPreview(clampRatio(invert ? 1 - position : position, ratio, bounds))
     }

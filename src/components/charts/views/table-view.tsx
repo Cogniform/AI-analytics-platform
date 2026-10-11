@@ -54,9 +54,18 @@ export const TableView = React.memo(function TableView({
     result[column] = storedWidths[column] ?? DEFAULT_COLUMN_WIDTH
     return result
   }, {})
-  const virtual = calculateVirtualWindow(data.length, viewportHeight, ROW_HEIGHT, scrollTop, OVERSCAN)
+  const virtual = calculateVirtualWindow(
+    data.length,
+    viewportHeight,
+    ROW_HEIGHT,
+    scrollTop,
+    OVERSCAN,
+  )
   const visibleRows = data.slice(virtual.start, virtual.end)
-  const tableWidth = columns.reduce((total, column) => total + (widths[column] ?? DEFAULT_COLUMN_WIDTH), 0)
+  const tableWidth = columns.reduce(
+    (total, column) => total + (widths[column] ?? DEFAULT_COLUMN_WIDTH),
+    0,
+  )
 
   function updateColumnWidth(column: string, width: number) {
     const nextWidth = Math.max(MIN_COLUMN_WIDTH, Math.min(MAX_COLUMN_WIDTH, Math.round(width)))
@@ -71,7 +80,8 @@ export const TableView = React.memo(function TableView({
     event.preventDefault()
     const startX = event.clientX
     const startWidth = widths[column] ?? DEFAULT_COLUMN_WIDTH
-    const move = (pointerEvent: PointerEvent) => updateColumnWidth(column, startWidth + pointerEvent.clientX - startX)
+    const move = (pointerEvent: PointerEvent) =>
+      updateColumnWidth(column, startWidth + pointerEvent.clientX - startX)
     const stop = () => {
       window.removeEventListener("pointermove", move)
       window.removeEventListener("pointerup", stop)
@@ -92,7 +102,8 @@ export const TableView = React.memo(function TableView({
     const offset = movement[event.key]
     if (offset !== undefined) viewport.scrollBy({ top: offset, behavior: "auto" })
     else if (event.key === "Home") viewport.scrollTo({ top: 0, behavior: "auto" })
-    else if (event.key === "End") viewport.scrollTo({ top: data.length * ROW_HEIGHT, behavior: "auto" })
+    else if (event.key === "End")
+      viewport.scrollTo({ top: data.length * ROW_HEIGHT, behavior: "auto" })
     else return
     event.preventDefault()
   }
@@ -107,12 +118,22 @@ export const TableView = React.memo(function TableView({
       onKeyDown={handleKeyboard}
     >
       <table className="table-fixed text-sm" style={{ width: tableWidth }}>
-        <colgroup>{columns.map((column) => <col key={column} style={{ width: widths[column] }} />)}</colgroup>
+        <colgroup>
+          {columns.map((column) => (
+            <col key={column} style={{ width: widths[column] }} />
+          ))}
+        </colgroup>
         <thead className="sticky top-0 z-10 bg-[var(--muted)] shadow-[0_1px_0_var(--border)]">
           <tr>
             {columns.map((column) => (
-              <th key={column} scope="col" className="relative h-8 overflow-hidden px-3 text-left text-xs font-medium text-[var(--foreground)]">
-                <span className="block truncate" title={column}>{column}</span>
+              <th
+                key={column}
+                scope="col"
+                className="relative h-8 overflow-hidden px-3 text-left text-xs font-medium text-[var(--foreground)]"
+              >
+                <span className="block truncate" title={column}>
+                  {column}
+                </span>
                 <button
                   type="button"
                   aria-label={`调整 ${column} 列宽`}
@@ -120,7 +141,11 @@ export const TableView = React.memo(function TableView({
                   onPointerDown={(event) => startResize(event, column)}
                   onKeyDown={(event) => {
                     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return
-                    updateColumnWidth(column, (widths[column] ?? DEFAULT_COLUMN_WIDTH) + (event.key === "ArrowRight" ? 16 : -16))
+                    updateColumnWidth(
+                      column,
+                      (widths[column] ?? DEFAULT_COLUMN_WIDTH) +
+                        (event.key === "ArrowRight" ? 16 : -16),
+                    )
                     event.preventDefault()
                   }}
                 />
@@ -129,16 +154,27 @@ export const TableView = React.memo(function TableView({
           </tr>
         </thead>
         <tbody>
-          {virtual.paddingTop > 0 && <SpacerRow columns={columns.length} height={virtual.paddingTop} />}
+          {virtual.paddingTop > 0 && (
+            <SpacerRow columns={columns.length} height={virtual.paddingTop} />
+          )}
           {visibleRows.map((row, offset) => {
             const rowIndex = virtual.start + offset
             return (
-              <tr key={rowIndex} data-row-index={rowIndex} style={{ height: ROW_HEIGHT }} className="border-b border-[var(--border)] hover:bg-[var(--accent)]">
-                {columns.map((column) => <DataCell key={column} value={row[column]} />)}
+              <tr
+                key={rowIndex}
+                data-row-index={rowIndex}
+                style={{ height: ROW_HEIGHT }}
+                className="border-b border-[var(--border)] hover:bg-[var(--accent)]"
+              >
+                {columns.map((column) => (
+                  <DataCell key={column} value={row[column]} />
+                ))}
               </tr>
             )
           })}
-          {virtual.paddingBottom > 0 && <SpacerRow columns={columns.length} height={virtual.paddingBottom} />}
+          {virtual.paddingBottom > 0 && (
+            <SpacerRow columns={columns.length} height={virtual.paddingBottom} />
+          )}
         </tbody>
       </table>
     </div>
@@ -147,14 +183,31 @@ export const TableView = React.memo(function TableView({
 
 function DataCell({ value }: { value: unknown }) {
   if (value === null || value === undefined) {
-    return <td className="truncate px-3 py-1.5 text-xs"><span aria-label="空值" className="font-mono text-[10px] text-[var(--muted-foreground)] opacity-70">NULL</span></td>
+    return (
+      <td className="truncate px-3 py-1.5 text-xs">
+        <span
+          aria-label="空值"
+          className="font-mono text-[10px] text-[var(--muted-foreground)] opacity-70"
+        >
+          NULL
+        </span>
+      </td>
+    )
   }
   const formatted = typeof value === "number" ? formatNumber(value) : String(value)
-  return <td className="truncate px-3 py-1.5 text-xs text-[var(--muted-foreground)]" title={formatted}>{formatted}</td>
+  return (
+    <td className="truncate px-3 py-1.5 text-xs text-[var(--muted-foreground)]" title={formatted}>
+      {formatted}
+    </td>
+  )
 }
 
 function SpacerRow({ columns, height }: { columns: number; height: number }) {
-  return <tr aria-hidden="true"><td colSpan={columns} style={{ height, padding: 0, border: 0 }} /></tr>
+  return (
+    <tr aria-hidden="true">
+      <td colSpan={columns} style={{ height, padding: 0, border: 0 }} />
+    </tr>
+  )
 }
 
 function readColumnWidths(key: string): ColumnWidths {
@@ -162,7 +215,12 @@ function readColumnWidths(key: string): ColumnWidths {
   try {
     const parsed: unknown = JSON.parse(window.localStorage.getItem(key) ?? "{}")
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {}
-    return Object.fromEntries(Object.entries(parsed).filter((entry): entry is [string, number] => typeof entry[1] === "number" && Number.isFinite(entry[1])))
+    return Object.fromEntries(
+      Object.entries(parsed).filter(
+        (entry): entry is [string, number] =>
+          typeof entry[1] === "number" && Number.isFinite(entry[1]),
+      ),
+    )
   } catch {
     return {}
   }

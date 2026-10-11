@@ -1,6 +1,6 @@
-import { Pool } from 'pg'
-import { decrypt } from './encryption'
-import { prisma } from './prisma'
+import { Pool } from "pg"
+import { decrypt } from "./encryption"
+import { prisma } from "./prisma"
 
 export interface ColumnInfo {
   name: string
@@ -37,11 +37,11 @@ export interface DatabaseSchema {
 
 export async function getPool(connectionId: string): Promise<Pool> {
   const connection = await prisma.connection.findUnique({
-    where: { id: connectionId }
+    where: { id: connectionId },
   })
 
   if (!connection) {
-    throw new Error('连接不存在')
+    throw new Error("连接不存在")
   }
 
   const password = decrypt(connection.passwordEncrypted)
@@ -53,15 +53,23 @@ export async function getPool(connectionId: string): Promise<Pool> {
     user: connection.username,
     password,
     ssl: connection.ssl,
-    max: 5
+    max: 5,
   })
 }
 
 // 平台自身的元数据表，不展示给用户、不喂给 AI（schema 扫描与数据轮廓扫描共用）
 export const PLATFORM_TABLES = [
-  'users', 'connections', 'schema_snapshots', 'saved_queries', 'query_history',
-  'dashboards', 'dashboard_widgets', 'analysis_templates',
-  'ai_conversations', 'ai_messages', 'system_configs',
+  "users",
+  "connections",
+  "schema_snapshots",
+  "saved_queries",
+  "query_history",
+  "dashboards",
+  "dashboard_widgets",
+  "analysis_templates",
+  "ai_conversations",
+  "ai_messages",
+  "system_configs",
 ]
 
 export async function scanSchema(connectionId: string): Promise<DatabaseSchema> {
@@ -69,15 +77,18 @@ export async function scanSchema(connectionId: string): Promise<DatabaseSchema> 
 
   try {
     // 获取所有表（排除平台元数据表）
-    const tablesResult = await pool.query(`
+    const tablesResult = await pool.query(
+      `
       SELECT
         t.table_name,
         obj_description((quote_ident(t.table_name))::regclass) as table_comment
       FROM information_schema.tables t
       WHERE t.table_schema = 'public'
-        AND t.table_name NOT IN (${PLATFORM_TABLES.map((_, i) => `$${i + 1}`).join(',')})
+        AND t.table_name NOT IN (${PLATFORM_TABLES.map((_, i) => `$${i + 1}`).join(",")})
       ORDER BY t.table_name
-    `, PLATFORM_TABLES)
+    `,
+      PLATFORM_TABLES,
+    )
 
     const tables: TableInfo[] = []
 
@@ -87,22 +98,22 @@ export async function scanSchema(connectionId: string): Promise<DatabaseSchema> 
 
       tables.push({
         name: tableName,
-        schema: 'public',
+        schema: "public",
         comment: tableRow.table_comment,
-        columns: columnsResult.rows.map(col => ({
+        columns: columnsResult.rows.map((col) => ({
           name: col.column_name,
           type: col.data_type,
-          nullable: col.is_nullable === 'YES',
+          nullable: col.is_nullable === "YES",
           isPrimary: col.is_primary,
           comment: col.column_comment,
-          defaultValue: col.column_default
+          defaultValue: col.column_default,
         })),
-        indexes: indexesResult.rows.map(idx => ({
+        indexes: indexesResult.rows.map((idx) => ({
           name: idx.indexname,
           columns: [], // 简化处理
-          unique: idx.indexdef.includes('UNIQUE')
+          unique: idx.indexdef.includes("UNIQUE"),
         })),
-        rowEstimate: parseInt(statsResult.rows[0]?.estimate || '0')
+        rowEstimate: parseInt(statsResult.rows[0]?.estimate || "0"),
       })
     }
 
@@ -112,7 +123,7 @@ export async function scanSchema(connectionId: string): Promise<DatabaseSchema> 
       version: Math.floor(Date.now() / 1000),
       scannedAt: new Date(),
       tables,
-      relations
+      relations,
     }
   } finally {
     await pool.end()
@@ -122,7 +133,8 @@ export async function scanSchema(connectionId: string): Promise<DatabaseSchema> 
 /** 单表三项信息：列、索引、行数估计（现状每表 3 次查询） */
 async function fetchTableDetails(pool: Pool, tableName: string) {
   // 获取列信息
-  const columnsResult = await pool.query(`
+  const columnsResult = await pool.query(
+    `
     SELECT
       c.column_name,
       c.data_type,
@@ -139,23 +151,31 @@ async function fetchTableDetails(pool: Pool, tableName: string) {
     ) pk ON c.column_name = pk.column_name
     WHERE c.table_name = $1
     ORDER BY c.ordinal_position
-  `, [tableName])
+  `,
+    [tableName],
+  )
 
   // 获取索引
-  const indexesResult = await pool.query(`
+  const indexesResult = await pool.query(
+    `
     SELECT
       indexname,
       indexdef
     FROM pg_indexes
     WHERE tablename = $1
-  `, [tableName])
+  `,
+    [tableName],
+  )
 
   // 获取行数估计
-  const statsResult = await pool.query(`
+  const statsResult = await pool.query(
+    `
     SELECT reltuples::bigint as estimate
     FROM pg_class
     WHERE relname = $1
-  `, [tableName])
+  `,
+    [tableName],
+  )
 
   return { columnsResult, indexesResult, statsResult }
 }
@@ -178,37 +198,38 @@ async function fetchRelations(pool: Pool): Promise<RelationInfo[]> {
     WHERE tc.constraint_type = 'FOREIGN KEY'
   `)
 
-  return relationsResult.rows.map(row => ({
+  return relationsResult.rows.map((row) => ({
     name: row.constraint_name,
     fromTable: row.from_table,
     fromColumn: row.from_column,
     toTable: row.to_table,
-    toColumn: row.to_column
+    toColumn: row.to_column,
   }))
 }
 
 export function buildSchemaContext(schema: DatabaseSchema): string {
-  let context = '## 数据库结构\n\n'
+  let context = "## 数据库结构\n\n"
 
-  context += '这是当前连接的数据库结构。只使用下方真实存在的表、列和关系，不要假设行业模型或预置业务指标。\n\n'
+  context +=
+    "这是当前连接的数据库结构。只使用下方真实存在的表、列和关系，不要假设行业模型或预置业务指标。\n\n"
 
   // 详细表结构
-  context += '### 表结构详情\n'
-  schema.tables.forEach(table => {
+  context += "### 表结构详情\n"
+  schema.tables.forEach((table) => {
     context += `\n#### ${table.name}\n`
-    table.columns.forEach(col => {
+    table.columns.forEach((col) => {
       const parts = [col.name, col.type]
-      if (col.isPrimary) parts.push('PK')
-      if (!col.nullable) parts.push('NOT NULL')
+      if (col.isPrimary) parts.push("PK")
+      if (!col.nullable) parts.push("NOT NULL")
       if (col.comment) parts.push(`-- ${col.comment}`)
-      context += `- ${parts.join(' ')}\n`
+      context += `- ${parts.join(" ")}\n`
     })
   })
 
   // 关系
   if (schema.relations.length > 0) {
-    context += '\n### 表关系\n'
-    schema.relations.forEach(rel => {
+    context += "\n### 表关系\n"
+    schema.relations.forEach((rel) => {
       context += `- ${rel.fromTable}.${rel.fromColumn} -> ${rel.toTable}.${rel.toColumn}\n`
     })
   }

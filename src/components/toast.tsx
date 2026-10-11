@@ -17,7 +17,8 @@ const ToastContext = createContext<ToastContextType>({ toast: () => {} })
 
 const TOAST_STYLES: Record<Toast["type"], string> = {
   success: "border-[var(--success-border)] bg-[var(--success-surface)] text-[var(--success)]",
-  error: "border-[var(--destructive-border)] bg-[var(--destructive-surface)] text-[var(--destructive)]",
+  error:
+    "border-[var(--destructive-border)] bg-[var(--destructive-surface)] text-[var(--destructive)]",
   warning: "border-[var(--warning-border)] bg-[var(--warning-surface)] text-[var(--warning)]",
   info: "border-[var(--border)] bg-[var(--popover)] text-[var(--popover-foreground)]",
 }

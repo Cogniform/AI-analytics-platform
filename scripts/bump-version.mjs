@@ -16,7 +16,8 @@ export function nextVersion(current, input) {
   }
   if (/^\d+\.\d+\.\d+$/.test(input || "")) return input
   const index = RELEASE_INDEX[input]
-  if (index === undefined) throw new Error("用法: node scripts/bump-version.mjs {major|minor|patch|X.Y.Z}")
+  if (index === undefined)
+    throw new Error("用法: node scripts/bump-version.mjs {major|minor|patch|X.Y.Z}")
   const next = [...parts]
   next[index] += 1
   for (let i = index + 1; i < 3; i += 1) next[i] = 0

@@ -26,7 +26,10 @@ describe("render-binder: bindDataToChart", () => {
         { region: "华南", amount: 200 },
       ],
     )
-    const config: DisplayConfig = { chartType: "line", mapping: { chartType: "line", x: "amount", y: "region" } }
+    const config: DisplayConfig = {
+      chartType: "line",
+      mapping: { chartType: "line", x: "amount", y: "region" },
+    }
     const result = bindDataToChart(ds, config)
 
     expect(result.adjustments).toHaveLength(1)
@@ -43,7 +46,10 @@ describe("render-binder: bindDataToChart", () => {
       ],
       [{ day: "2026-01-01", sales: 10 }],
     )
-    const config: DisplayConfig = { chartType: "line", mapping: { chartType: "line", x: "day", y: "sales" } }
+    const config: DisplayConfig = {
+      chartType: "line",
+      mapping: { chartType: "line", x: "day", y: "sales" },
+    }
     const result = bindDataToChart(ds, config)
 
     expect(result.adjustments).toHaveLength(0)
@@ -64,7 +70,10 @@ describe("render-binder: bindDataToChart", () => {
         { category: "D", total: 40 },
       ],
     )
-    const config: DisplayConfig = { chartType: "bar", mapping: { chartType: "bar", x: "category", y: "total" } }
+    const config: DisplayConfig = {
+      chartType: "bar",
+      mapping: { chartType: "bar", x: "category", y: "total" },
+    }
     const result = bindDataToChart(ds, config)
 
     expect(result.rows).toHaveLength(2)
@@ -86,7 +95,10 @@ describe("render-binder: bindDataToChart", () => {
         { x: 4, y: null },
       ],
     )
-    const config: DisplayConfig = { chartType: "scatter", mapping: { chartType: "scatter", x: "x", y: "y" } }
+    const config: DisplayConfig = {
+      chartType: "scatter",
+      mapping: { chartType: "scatter", x: "x", y: "y" },
+    }
     const result = bindDataToChart(ds, config)
 
     expect(result.rows).toHaveLength(1)
@@ -105,7 +117,10 @@ describe("render-binder: bindDataToChart", () => {
         { name: "C", value: 30 },
       ],
     )
-    const config: DisplayConfig = { chartType: "pie", mapping: { chartType: "pie", name: "name", value: "value" } }
+    const config: DisplayConfig = {
+      chartType: "pie",
+      mapping: { chartType: "pie", name: "name", value: "value" },
+    }
     const result = bindDataToChart(ds, config)
 
     expect(result.rows).toHaveLength(2)

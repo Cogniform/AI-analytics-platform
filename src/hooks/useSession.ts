@@ -32,7 +32,10 @@ export interface UseSessionResult {
 }
 
 /** React Strict Mode may replay an effect; execution is keyed by object identity. */
-export function shouldStartCompiledExecution(previous: CompiledSql | null, next: CompiledSql): boolean {
+export function shouldStartCompiledExecution(
+  previous: CompiledSql | null,
+  next: CompiledSql,
+): boolean {
   return previous !== next
 }
 
@@ -40,7 +43,9 @@ export function useSession(options: UseSessionOptions): UseSessionResult {
   const { connectionId, schema, executeCompiled, initialSession, autoRun = true } = options
 
   const reducer = useMemo(() => createSessionReducer({ schema }), [schema])
-  const [state, dispatch] = useReducer(reducer, initialSession ?? {}, (s) => createInitialSession(s))
+  const [state, dispatch] = useReducer(reducer, initialSession ?? {}, (s) =>
+    createInitialSession(s),
+  )
 
   // 最新值 ref：副作用内部读取，不参与依赖比较。
   // 不能在渲染期更新 ref（react-hooks/refs），统一在无依赖的 effect 中同步；

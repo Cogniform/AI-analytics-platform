@@ -8,13 +8,7 @@ import type { ValidationIssue } from "@/lib/validators"
 // ---- 语义类型（与 components/charts/pipeline.ts 保持一致，并扩展） ----
 
 export type SemanticType =
-  | "numeric"
-  | "temporal"
-  | "categorical"
-  | "boolean"
-  | "identifier"
-  | "text"
-  | "unknown"
+  "numeric" | "temporal" | "categorical" | "boolean" | "identifier" | "text" | "unknown"
 
 // ---- 查询规范（QuerySpec） ----
 
@@ -120,12 +114,7 @@ export interface DisplayConfig {
 // ---- 会话状态 ----
 
 export type SessionStatus =
-  | "idle"
-  | "compiling"
-  | "executing"
-  | "ready"
-  | "error"
-  | "needs_recompile"
+  "idle" | "compiling" | "executing" | "ready" | "error" | "needs_recompile"
 
 export interface ConversationMessage {
   role: "user" | "assistant"

@@ -45,7 +45,10 @@ describe("洞察项契约单一来源", () => {
   })
 
   it("提示词里的形状示例替换占位符后是合法 JSON", () => {
-    for (const prefix of ["- 根对象形状（优先变体）：", "- 根对象形状（回退变体，仅当无法给出 querySpec 时使用）："]) {
+    for (const prefix of [
+      "- 根对象形状（优先变体）：",
+      "- 根对象形状（回退变体，仅当无法给出 querySpec 时使用）：",
+    ]) {
       const line = prompt.split("\n").find((candidate) => candidate.startsWith(prefix))
       expect(line).toBeDefined()
       const json = (line as string)
@@ -68,14 +71,19 @@ describe("洞察项契约单一来源", () => {
 
   it("解析按声明截断标题与结论长度", () => {
     const content = JSON.stringify({
-      items: [{
-        title: "标".repeat(120),
-        insight: "结".repeat(1200),
-        querySpec: { table: "sales", measures: [{ field: "amount", aggregation: "sum", alias: "total" }] },
-        displayConfig: { chartType: "kpi", mapping: { value: "total" } },
-        context: [],
-        statTest: null,
-      }],
+      items: [
+        {
+          title: "标".repeat(120),
+          insight: "结".repeat(1200),
+          querySpec: {
+            table: "sales",
+            measures: [{ field: "amount", aggregation: "sum", alias: "total" }],
+          },
+          displayConfig: { chartType: "kpi", mapping: { value: "total" } },
+          context: [],
+          statTest: null,
+        },
+      ],
     })
 
     const item = indexed(parseInsightItems(content), 0)
@@ -86,22 +94,39 @@ describe("洞察项契约单一来源", () => {
 
   it("两条解析分支的截断长度都必须跟随同一份 schema 声明", () => {
     const long = { title: "标".repeat(120), insight: "结".repeat(1200) }
-    const preferred = indexed(parseInsightItems(JSON.stringify({
-      items: [{
-        ...long,
-        querySpec: { table: "sales", measures: [{ field: "amount", aggregation: "sum", alias: "total" }] },
-        displayConfig: { chartType: "kpi", mapping: { value: "total" } },
-        context: [],
-        statTest: null,
-      }],
-    })), 0)
-    const fallback = indexed(parseInsightItems(JSON.stringify({
-      items: [{
-        ...long,
-        sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
-        chart: { type: "bar", mapping: { x: "region", y: "total" } },
-      }],
-    })), 0)
+    const preferred = indexed(
+      parseInsightItems(
+        JSON.stringify({
+          items: [
+            {
+              ...long,
+              querySpec: {
+                table: "sales",
+                measures: [{ field: "amount", aggregation: "sum", alias: "total" }],
+              },
+              displayConfig: { chartType: "kpi", mapping: { value: "total" } },
+              context: [],
+              statTest: null,
+            },
+          ],
+        }),
+      ),
+      0,
+    )
+    const fallback = indexed(
+      parseInsightItems(
+        JSON.stringify({
+          items: [
+            {
+              ...long,
+              sql: "SELECT region AS region, SUM(amount) AS total FROM sales GROUP BY region",
+              chart: { type: "bar", mapping: { x: "region", y: "total" } },
+            },
+          ],
+        }),
+      ),
+      0,
+    )
 
     // 上一例只走优先变体；回退变体是另一条独立语句，不跟声明就会单侧漂移
     expect(fallback.title.length).toBe(declaredMaxLength(1, "title"))

@@ -46,13 +46,18 @@ export default function QueriesPage() {
         if (history.success) setQueryHistory(history.data)
         setAnalysisHistory(analysis)
       } catch (requestError) {
-        if (active) setError(requestError instanceof ApiRequestError ? requestError.message : "查询列表加载失败")
+        if (active)
+          setError(
+            requestError instanceof ApiRequestError ? requestError.message : "查询列表加载失败",
+          )
       } finally {
         if (active) setLoading(false)
       }
     }
     void loadQueries(connectionId)
-    return () => { active = false }
+    return () => {
+      active = false
+    }
   }, [connectionId])
 
   // 统一历史时间线：SQL（query_history）+ AI/R（analysis_history）读取期合并，权威源都在服务端
@@ -71,7 +76,11 @@ export default function QueriesPage() {
   /** 时间线条目的「执行」：SQL/AI 带 SQL 直达；R 额外带 `r=<id>` 让工作台回放该条代码 */
   function openTimelineItem(item: TimelineItem) {
     if (!item.openSql) return
-    const url = buildHistoryWorkspaceUrl(connectionId, item.openSql, item.kind === "r" ? item.id : null)
+    const url = buildHistoryWorkspaceUrl(
+      connectionId,
+      item.openSql,
+      item.kind === "r" ? item.id : null,
+    )
     if (url) window.location.assign(url)
   }
 
@@ -81,7 +90,10 @@ export default function QueriesPage() {
       setSavedQueries((prev) => prev.filter((q) => q.id !== id))
       toast("已删除", "info")
     } catch (requestError) {
-      toast(requestError instanceof ApiRequestError ? requestError.message : "删除失败，请重试", "error")
+      toast(
+        requestError instanceof ApiRequestError ? requestError.message : "删除失败，请重试",
+        "error",
+      )
     }
   }
 
@@ -91,11 +103,17 @@ export default function QueriesPage() {
   }
 
   const filteredSaved = savedQueries.filter(
-    (q) => q.name.toLowerCase().includes(search.toLowerCase()) || q.sql.toLowerCase().includes(search.toLowerCase())
+    (q) =>
+      q.name.toLowerCase().includes(search.toLowerCase()) ||
+      q.sql.toLowerCase().includes(search.toLowerCase()),
   )
 
   if (!connectionId) {
-    return <div className="p-6 flex items-center justify-center min-h-[50vh] text-[var(--muted-foreground)] text-xs">请先选择数据库连接</div>
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[50vh] text-[var(--muted-foreground)] text-xs">
+        请先选择数据库连接
+      </div>
+    )
   }
 
   return (
@@ -106,11 +124,20 @@ export default function QueriesPage() {
           {savedQueries.length} 收藏 · {mergedTimeline.length} 历史
         </span>
       </div>
-      {error && <div className="mb-3 rounded-md border border-[var(--destructive-border)] bg-[var(--destructive-surface)] px-3 py-2 text-xs text-[var(--destructive)]">{error}</div>}
+      {error && (
+        <div className="mb-3 rounded-md border border-[var(--destructive-border)] bg-[var(--destructive-surface)] px-3 py-2 text-xs text-[var(--destructive)]">
+          {error}
+        </div>
+      )}
 
       <div className="relative mb-3">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--muted-foreground)]" />
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="搜索查询..." className="pl-8 h-8 text-xs" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="搜索查询..."
+          className="pl-8 h-8 text-xs"
+        />
       </div>
 
       <Tabs defaultValue="saved">
@@ -132,17 +159,38 @@ export default function QueriesPage() {
           ) : (
             <div className="space-y-2">
               {filteredSaved.map((q) => (
-                <div key={q.id} className="group border rounded-md p-3 hover:border-[var(--border)] transition-colors">
+                <div
+                  key={q.id}
+                  className="group border rounded-md p-3 hover:border-[var(--border)] transition-colors"
+                >
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <span className="text-xs font-medium text-[var(--foreground)]">{q.name}</span>
                     <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => goToWorkspace(q.sql)} title="执行">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={() => goToWorkspace(q.sql)}
+                        title="执行"
+                      >
                         <Play className="w-3 h-3" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => copySql(q.sql)} title="复制">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={() => copySql(q.sql)}
+                        title="复制"
+                      >
                         <Copy className="w-3 h-3" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-[var(--muted-foreground)] hover:text-[var(--destructive)]" onClick={() => deleteSaved(q.id)} title="删除">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 text-[var(--muted-foreground)] hover:text-[var(--destructive)]"
+                        onClick={() => deleteSaved(q.id)}
+                        title="删除"
+                      >
                         <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>

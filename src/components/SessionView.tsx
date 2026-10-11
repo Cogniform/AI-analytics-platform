@@ -109,7 +109,10 @@ export function SessionView({
       <div className="flex items-center justify-between px-3 py-1.5 bg-[var(--muted)] shrink-0">
         <div className="flex min-w-0 items-center gap-2">
           <span className="text-xs font-medium text-[var(--muted-foreground)]">分析结果</span>
-          <span aria-live="polite" className="rounded px-1.5 py-0.5 text-[10px] text-[var(--muted-foreground)]">
+          <span
+            aria-live="polite"
+            className="rounded px-1.5 py-0.5 text-[10px] text-[var(--muted-foreground)]"
+          >
             {statusText}
           </span>
         </div>
@@ -134,16 +137,27 @@ export function SessionView({
       {!showTabs ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
           {busy ? (
-            <Loader2 className="h-6 w-6 animate-spin text-[var(--muted-foreground)]" aria-hidden="true" />
+            <Loader2
+              className="h-6 w-6 animate-spin text-[var(--muted-foreground)]"
+              aria-hidden="true"
+            />
           ) : (
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--muted)] text-[var(--muted-foreground)]">{status === "error" ? "!" : ""}</div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--muted)] text-[var(--muted-foreground)]">
+              {status === "error" ? "!" : ""}
+            </div>
           )}
           <div className="space-y-1">
-            <p className={`text-xs font-medium ${status === "error" ? "text-[var(--destructive)]" : "text-[var(--foreground)]"}`}>
+            <p
+              className={`text-xs font-medium ${status === "error" ? "text-[var(--destructive)]" : "text-[var(--foreground)]"}`}
+            >
               {busy ? "正在执行查询" : status === "error" ? "查询未完成" : "执行 SQL 后查看结果"}
             </p>
             <p className="text-[11px] text-[var(--muted-foreground)]">
-              {busy ? "结果准备好后会显示在这里" : status === "error" ? session.error || "请检查 SQL 和数据库连接后重试" : "查询结果、图表和明细会集中显示在此区域"}
+              {busy
+                ? "结果准备好后会显示在这里"
+                : status === "error"
+                  ? session.error || "请检查 SQL 和数据库连接后重试"
+                  : "查询结果、图表和明细会集中显示在此区域"}
             </p>
           </div>
           {sql && (
@@ -151,18 +165,29 @@ export function SessionView({
               {sql}
             </pre>
           )}
-          {status === "error" && <div role="alert" className="sr-only">{session.error || "查询失败"}</div>}
+          {status === "error" && (
+            <div role="alert" className="sr-only">
+              {session.error || "查询失败"}
+            </div>
+          )}
         </div>
       ) : (
         <>
           {busy && (
-            <div className="shrink-0 border-b border-[var(--border)] bg-[var(--muted)] px-3 py-1.5 text-[11px] text-[var(--muted-foreground)]" aria-live="polite">
+            <div
+              className="shrink-0 border-b border-[var(--border)] bg-[var(--muted)] px-3 py-1.5 text-[11px] text-[var(--muted-foreground)]"
+              aria-live="polite"
+            >
               正在更新结果，当前结果仍可查看
             </div>
           )}
 
           {/* 三层视图：洞察 / 探索 / 明细 */}
-          <Tabs value={tab} onValueChange={(v) => changeTab(String(v))} className="flex min-h-0 flex-1 flex-col gap-0">
+          <Tabs
+            value={tab}
+            onValueChange={(v) => changeTab(String(v))}
+            className="flex min-h-0 flex-1 flex-col gap-0"
+          >
             <div className="shrink-0 px-3 pt-2">
               <TabsList variant="line">
                 {hasInsights && (
@@ -170,8 +195,12 @@ export function SessionView({
                     洞察 {insights.length}
                   </TabsTrigger>
                 )}
-                <TabsTrigger value="explore" title="把结果画成图（可配置列映射）">探索</TabsTrigger>
-                <TabsTrigger value="data" title="原始查询结果，不经过图表过滤">明细</TabsTrigger>
+                <TabsTrigger value="explore" title="把结果画成图（可配置列映射）">
+                  探索
+                </TabsTrigger>
+                <TabsTrigger value="data" title="原始查询结果，不经过图表过滤">
+                  明细
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -198,34 +227,36 @@ export function SessionView({
             <TabsContent value="explore" keepMounted className={`${PANEL_SCROLL} space-y-2`}>
               {result && bound ? (
                 <>
-              {session.validationIssues?.map((issue) => (
-                <ChartNotice
-                  key={`${issue.code}-${issue.field ?? ""}`}
-                  tone={issue.severity === "error" ? "warning" : "muted"}
-                >
-                  {issue.message}
-                </ChartNotice>
-              ))}
-              {bound.warnings.map((warning) => (
-                <ChartNotice key={warning.code} tone="warning">
-                  {warning.message}
-                </ChartNotice>
-              ))}
-              {bound.adjustments.map((adjustment) => (
-                <ChartNotice key={adjustment.code} tone="muted">
-                  {adjustment.message}
-                </ChartNotice>
-              ))}
-              <ResultPanel
-                result={{ ...result, rows: bound.rows }}
-                onCopySql={onCopySql}
-                mapping={bound.mapping}
-                onMappingChange={onMappingChange}
-                embedded
-              />
+                  {session.validationIssues?.map((issue) => (
+                    <ChartNotice
+                      key={`${issue.code}-${issue.field ?? ""}`}
+                      tone={issue.severity === "error" ? "warning" : "muted"}
+                    >
+                      {issue.message}
+                    </ChartNotice>
+                  ))}
+                  {bound.warnings.map((warning) => (
+                    <ChartNotice key={warning.code} tone="warning">
+                      {warning.message}
+                    </ChartNotice>
+                  ))}
+                  {bound.adjustments.map((adjustment) => (
+                    <ChartNotice key={adjustment.code} tone="muted">
+                      {adjustment.message}
+                    </ChartNotice>
+                  ))}
+                  <ResultPanel
+                    result={{ ...result, rows: bound.rows }}
+                    onCopySql={onCopySql}
+                    mapping={bound.mapping}
+                    onMappingChange={onMappingChange}
+                    embedded
+                  />
                 </>
               ) : (
-                <p className="text-[11px] text-[var(--muted-foreground)]">查询结果未保留，点击编辑器「执行」重看本次结果。</p>
+                <p className="text-[11px] text-[var(--muted-foreground)]">
+                  查询结果未保留，点击编辑器「执行」重看本次结果。
+                </p>
               )}
             </TabsContent>
 
@@ -236,7 +267,9 @@ export function SessionView({
                   <Chart mapping={{ chartType: "table" }} data={result.rows} fillHeight />
                 </div>
               ) : (
-                <p className="text-[11px] text-[var(--muted-foreground)]">查询结果未保留，点击编辑器「执行」重看本次结果。</p>
+                <p className="text-[11px] text-[var(--muted-foreground)]">
+                  查询结果未保留，点击编辑器「执行」重看本次结果。
+                </p>
               )}
             </TabsContent>
           </Tabs>

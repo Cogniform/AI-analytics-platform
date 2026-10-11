@@ -1,7 +1,8 @@
 # 决策：分支卫生与依赖 PR 节奏（线性分支策略）
 
+状态：生效
+
 - 日期：2026-09-11
-- 状态：已实施（清理与策略落地；4 个 Actions PR 待授权后合并）
 - 范围：远程分支、[`.github/dependabot.yml`](../../.github/dependabot.yml)、main ruleset、根 [AGENTS.md](../../AGENTS.md)、[docs/operations.md](../../docs/operations.md)
 
 ## 问题

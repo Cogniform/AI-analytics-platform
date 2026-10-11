@@ -1,8 +1,8 @@
-import { NextRequest } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { encrypt } from '@/lib/encryption'
-import { Pool } from 'pg'
-import { apiFailure, apiSuccess } from '@/lib/api-response'
+import { NextRequest } from "next/server"
+import { prisma } from "@/lib/prisma"
+import { encrypt } from "@/lib/encryption"
+import { Pool } from "pg"
+import { apiFailure, apiSuccess } from "@/lib/api-response"
 
 // 获取连接列表
 export async function GET() {
@@ -18,15 +18,19 @@ export async function GET() {
         status: true,
         tableCount: true,
         lastConnectedAt: true,
-        createdAt: true
+        createdAt: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     })
 
     return apiSuccess(connections)
   } catch (error) {
-    console.error('获取连接列表失败', error)
-    return apiFailure({ code: 'CONNECTION_LIST_FAILED', message: '获取连接列表失败，请稍后重试', retryable: true })
+    console.error("获取连接列表失败", error)
+    return apiFailure({
+      code: "CONNECTION_LIST_FAILED",
+      message: "获取连接列表失败，请稍后重试",
+      retryable: true,
+    })
   }
 }
 
@@ -38,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     // 验证必填字段
     if (!name || !host || !database || !username || !password) {
-      return apiFailure({ code: 'INVALID_REQUEST', message: '缺少必填字段', retryable: false }, 400)
+      return apiFailure({ code: "INVALID_REQUEST", message: "缺少必填字段", retryable: false }, 400)
     }
 
     // 测试连接
@@ -49,14 +53,21 @@ export async function POST(request: NextRequest) {
       user: username,
       password,
       ssl: ssl || false,
-      connectionTimeoutMillis: 5000
+      connectionTimeoutMillis: 5000,
     })
 
     try {
-      await testClient.query('SELECT 1')
+      await testClient.query("SELECT 1")
     } catch (error) {
-      console.error('连接测试失败', error)
-      return apiFailure({ code: 'CONNECTION_TEST_FAILED', message: '连接测试失败，请检查主机、端口、数据库和账号', retryable: false }, 400)
+      console.error("连接测试失败", error)
+      return apiFailure(
+        {
+          code: "CONNECTION_TEST_FAILED",
+          message: "连接测试失败，请检查主机、端口、数据库和账号",
+          retryable: false,
+        },
+        400,
+      )
     } finally {
       await testClient.end().catch(() => undefined)
     }
@@ -71,7 +82,7 @@ export async function POST(request: NextRequest) {
       database,
       user: username,
       password,
-      ssl: ssl || false
+      ssl: ssl || false,
     })
 
     let tableCount = 0
@@ -89,7 +100,7 @@ export async function POST(request: NextRequest) {
     // 创建连接
     const connection = await prisma.connection.create({
       data: {
-        userId: 'default-user', // MVP 阶段使用默认用户
+        userId: "default-user", // MVP 阶段使用默认用户
         name,
         description,
         host,
@@ -98,15 +109,19 @@ export async function POST(request: NextRequest) {
         username,
         passwordEncrypted,
         ssl: ssl || false,
-        status: 'connected',
+        status: "connected",
         tableCount,
-        lastConnectedAt: new Date()
-      }
+        lastConnectedAt: new Date(),
+      },
     })
 
     return apiSuccess(connection)
   } catch (error) {
-    console.error('创建连接失败', error)
-    return apiFailure({ code: 'CONNECTION_CREATE_FAILED', message: '创建连接失败，请稍后重试', retryable: true })
+    console.error("创建连接失败", error)
+    return apiFailure({
+      code: "CONNECTION_CREATE_FAILED",
+      message: "创建连接失败，请稍后重试",
+      retryable: true,
+    })
   }
 }

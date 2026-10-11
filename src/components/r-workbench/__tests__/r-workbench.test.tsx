@@ -119,7 +119,9 @@ async function settle(times = 4) {
 Element.prototype.scrollIntoView = () => {}
 
 describe("RWorkbench 历史回放", () => {
-  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -143,7 +145,10 @@ describe("RWorkbench 历史回放", () => {
       "ggplot(df, aes(x = x)) +",
       "  geom_histogram(bins = 5)",
     ].join("\n")
-    history.listRHistory.mockResolvedValueOnce([rEntry("r-latest", "summary(df)"), rEntry("r-old", replayCode, { sourceSql: "SELECT 1" })])
+    history.listRHistory.mockResolvedValueOnce([
+      rEntry("r-latest", "summary(df)"),
+      rEntry("r-old", replayCode, { sourceSql: "SELECT 1" }),
+    ])
 
     const { root } = await render({ replayId: "r-old" })
     await settle()
@@ -163,7 +168,8 @@ describe("RWorkbench 历史回放", () => {
     // 先清后跑：旧文本/旧图不会与回放结果混在一起
     const clearOrder = webr.clearOutput.mock.invocationCallOrder[0]
     const executeOrder = webr.execute.mock.invocationCallOrder[0]
-    if (clearOrder === undefined || executeOrder === undefined) throw new Error("invocationCallOrder 未记录")
+    if (clearOrder === undefined || executeOrder === undefined)
+      throw new Error("invocationCallOrder 未记录")
     expect(clearOrder).toBeLessThan(executeOrder)
     expect(webr.restoreOutput).not.toHaveBeenCalled()
 
@@ -171,7 +177,9 @@ describe("RWorkbench 历史回放", () => {
   })
 
   it("普通打开：不自动执行，恢复最近一条代码与其文本输出", async () => {
-    history.listRHistory.mockResolvedValueOnce([rEntry("r-1", "df <- data.frame(x = 1)\nsummary(df)", { output: ["[stdout] 上次输出"] })])
+    history.listRHistory.mockResolvedValueOnce([
+      rEntry("r-1", "df <- data.frame(x = 1)\nsummary(df)", { output: ["[stdout] 上次输出"] }),
+    ])
 
     const { root } = await render()
     await settle()
@@ -184,7 +192,9 @@ describe("RWorkbench 历史回放", () => {
   })
 
   it("回放 id 在服务端不存在：明确提示，不静默执行别的东西", async () => {
-    history.listRHistory.mockResolvedValueOnce([rEntry("r-1", "summary(df)", { output: ["[stdout] 最近一次"] })])
+    history.listRHistory.mockResolvedValueOnce([
+      rEntry("r-1", "summary(df)", { output: ["[stdout] 最近一次"] }),
+    ])
 
     const { root } = await render({ replayId: "r-missing" })
     await settle()
@@ -196,7 +206,9 @@ describe("RWorkbench 历史回放", () => {
   })
 
   it("回放但运行时不可用：退回该条历史的文本输出，不执行也不清空", async () => {
-    history.listRHistory.mockResolvedValueOnce([rEntry("r-1", "plot(df)", { output: ["[error] boom"] })])
+    history.listRHistory.mockResolvedValueOnce([
+      rEntry("r-1", "plot(df)", { output: ["[error] boom"] }),
+    ])
     webr.init.mockRejectedValueOnce(new Error("offline"))
 
     const { root } = await render({ replayId: "r-1" })
@@ -217,7 +229,9 @@ describe("RWorkbench 历史回放", () => {
     const { root } = await render()
     await settle()
 
-    expect(history.appendHistory).toHaveBeenCalledWith(expect.objectContaining({ kind: "r", output: [], imageCount: 2 }))
+    expect(history.appendHistory).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: "r", output: [], imageCount: 2 }),
+    )
 
     await act(async () => root.unmount())
   })

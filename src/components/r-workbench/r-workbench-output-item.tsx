@@ -22,8 +22,14 @@ export function RWorkbenchOutputItem({ item }: { item: ROutputItem }) {
         </div>
       )
     case "message":
-      return <pre className="whitespace-pre-wrap break-all text-[var(--muted-foreground)]">{item.data}</pre>
+      return (
+        <pre className="whitespace-pre-wrap break-all text-[var(--muted-foreground)]">
+          {item.data}
+        </pre>
+      )
     default:
-      return <pre className="whitespace-pre-wrap break-all text-[var(--foreground)]">{item.data}</pre>
+      return (
+        <pre className="whitespace-pre-wrap break-all text-[var(--foreground)]">{item.data}</pre>
+      )
   }
 }

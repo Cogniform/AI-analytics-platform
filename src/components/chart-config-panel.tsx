@@ -3,7 +3,13 @@
 import { useMemo, useState } from "react"
 import { DropdownSelect } from "@/components/ui/dropdown-select"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { Chart, type ChartMapping } from "@/components/chart"
 import { ChartIcon } from "@/components/charts/chart-icons"
 import {
@@ -13,8 +19,18 @@ import {
   CHART_TYPE_INFO,
   SELECTABLE_CHART_TYPES,
 } from "@/lib/variable-types"
-import { createMappingForChart, profileData, recommendCharts, validateChartMapping } from "@/components/charts/pipeline"
-import { getMappingSlot, isChartMappingSlot, setMappingSlot, type ChartMappingSlot } from "@/components/charts/mapping"
+import {
+  createMappingForChart,
+  profileData,
+  recommendCharts,
+  validateChartMapping,
+} from "@/components/charts/pipeline"
+import {
+  getMappingSlot,
+  isChartMappingSlot,
+  setMappingSlot,
+  type ChartMappingSlot,
+} from "@/components/charts/mapping"
 import { Eye, EyeOff } from "lucide-react"
 
 interface ChartConfigPanelProps {
@@ -37,7 +53,10 @@ export function ChartConfigPanel({ columns, data, mapping, onChange }: ChartConf
   const slots = CHART_TYPE_SLOTS[chartType] || {}
   const profile = useMemo(() => profileData(columns, data), [columns, data])
   const recommendations = useMemo(() => recommendCharts(profile).slice(0, 2), [profile])
-  const validation = useMemo(() => validateChartMapping(mapping, profile, data), [mapping, profile, data])
+  const validation = useMemo(
+    () => validateChartMapping(mapping, profile, data),
+    [mapping, profile, data],
+  )
 
   // Legend toggle
   const [showLegend, setShowLegend] = useState(true)
@@ -66,7 +85,9 @@ export function ChartConfigPanel({ columns, data, mapping, onChange }: ChartConf
     if (isGroupSlot && value && data.length > 0) {
       // 判断是否为数值列
       const sampleValues = data.slice(0, 20).map((d) => d[value])
-      const numericCount = sampleValues.filter((v) => v !== null && v !== undefined && !isNaN(Number(v))).length
+      const numericCount = sampleValues.filter(
+        (v) => v !== null && v !== undefined && !isNaN(Number(v)),
+      ).length
       const isNumeric = numericCount > sampleValues.length * 0.8
 
       if (isNumeric) {
@@ -104,7 +125,10 @@ export function ChartConfigPanel({ columns, data, mapping, onChange }: ChartConf
     <div className="space-y-3">
       {/* 未选择图表：引导区（数据表由「明细」Tab 独占，这里不再渲染第二份） */}
       {chartType === "table" && (
-        <div data-testid="chart-guide" className="rounded-md border border-[var(--border)] bg-[var(--muted)] px-3 py-2.5">
+        <div
+          data-testid="chart-guide"
+          className="rounded-md border border-[var(--border)] bg-[var(--muted)] px-3 py-2.5"
+        >
           <p className="text-xs font-medium text-[var(--foreground)]">为这份结果选择图表</p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-[var(--muted-foreground)]">
             逐行核对数据请切到「明细」，这里负责把结果画成图。
@@ -121,7 +145,9 @@ export function ChartConfigPanel({ columns, data, mapping, onChange }: ChartConf
                   <span className="font-medium text-[var(--foreground)]">
                     {CHART_TYPE_INFO[recommendation.chartType as ChartType]?.label}
                   </span>
-                  <span className="ml-1 text-[10px] text-[var(--muted-foreground)]">{recommendation.reason}</span>
+                  <span className="ml-1 text-[10px] text-[var(--muted-foreground)]">
+                    {recommendation.reason}
+                  </span>
                 </button>
               ))}
             </div>
@@ -172,11 +198,13 @@ export function ChartConfigPanel({ columns, data, mapping, onChange }: ChartConf
       )}
       {mapping.chartType === "bar" && mapping.fill && (
         <div className="flex gap-1.5" aria-label="柱状图排列方式">
-          {([
-            ["grouped", "分组"],
-            ["stacked", "堆叠"],
-            ["normalized", "百分比"],
-          ] as const).map(([mode, label]) => (
+          {(
+            [
+              ["grouped", "分组"],
+              ["stacked", "堆叠"],
+              ["normalized", "百分比"],
+            ] as const
+          ).map(([mode, label]) => (
             <button
               key={mode}
               type="button"
@@ -250,7 +278,10 @@ export function ChartConfigPanel({ columns, data, mapping, onChange }: ChartConf
         </summary>
         <div className="mt-1.5 flex flex-wrap gap-1">
           {columns.map((c) => (
-            <span key={c.name} className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--muted)] text-[var(--muted-foreground)] font-mono">
+            <span
+              key={c.name}
+              className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--muted)] text-[var(--muted-foreground)] font-mono"
+            >
               {c.name}
             </span>
           ))}
@@ -259,7 +290,10 @@ export function ChartConfigPanel({ columns, data, mapping, onChange }: ChartConf
 
       {/* 图表渲染：table 是「未选择图表」哨兵，此时不渲染图表 */}
       {chartType !== "table" && (
-        <div data-testid="chart-surface" className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)]">
+        <div
+          data-testid="chart-surface"
+          className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)]"
+        >
           <Chart mapping={mapping} data={data} showLegend={showLegend} />
         </div>
       )}

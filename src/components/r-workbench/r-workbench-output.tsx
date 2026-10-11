@@ -42,9 +42,7 @@ export function RWorkbenchOutput({ items, images, busy }: RWorkbenchOutputProps)
       {items.length === 0 && !busy && (
         <div className="text-[var(--muted-foreground)]">等待运行…（代码将在此显示输出与图表）</div>
       )}
-      {busy && items.length === 0 && (
-        <div className="text-[var(--muted-foreground)]">执行中…</div>
-      )}
+      {busy && items.length === 0 && <div className="text-[var(--muted-foreground)]">执行中…</div>}
       {items.length > 500 && (
         <div className="text-[var(--warning)]">输出过长，仅显示最近 500 条</div>
       )}

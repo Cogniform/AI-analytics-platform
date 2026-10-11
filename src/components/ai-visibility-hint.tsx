@@ -31,7 +31,9 @@ export function AiVisibilityHint() {
           <div className="rounded bg-[var(--muted)] border border-[var(--border)] p-2 text-[10px] leading-relaxed text-[var(--muted-foreground)]">
             <div className="font-medium text-[var(--foreground)]">AI 能看见</div>
             {visible.map((item) => (
-              <div key={item.label} title={item.fallback}>· {item.label}</div>
+              <div key={item.label} title={item.fallback}>
+                · {item.label}
+              </div>
             ))}
             <div className="font-medium text-[var(--foreground)] mt-1">AI 看不见</div>
             {hidden.map((item) => (
