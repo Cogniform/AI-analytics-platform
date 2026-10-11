@@ -29,6 +29,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - R 历史回放 + 服务端历史（浏览器 + 联网，真实连接 `dim_date`）: passed（历史页 R 条目「含图 1 张」→ 点「执行」自动开面板、未点运行即重跑出图；条目在元库 `analysis_history`，刷新/换浏览器仍在，见 [决策记录](.agents/notes/2026-09-11-history-persistence-and-r-replay-rerun.md)）
 
 ## 待办
+- [ ] monaco-editor 0.57 升级（Dependabot PR #68 已关）：import 路径与 worker 根因已探明，执行清单与验证链见 [#87](https://github.com/Cogniform/AI-analytics-platform/issues/87)
 - [ ] 联网人工验收 R 面板内恢复（重开面板恢复上次代码与文本输出）、`injecting` 提示与旧浏览器历史导入（图像输出、历史页 `?r=` 回放=重新执行出图、服务端历史跨浏览器可见已于 2026-09-11 浏览器确认）：[docs/verification.md](docs/verification.md)
 - [ ] 真实只读账号人工验收：[docs/verification.md](docs/verification.md)
 - [ ] 联网实测 statTest 黑盒统计成功路径（离线只覆盖错误路径）：[docs/PLAN.md](docs/PLAN.md)
