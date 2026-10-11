@@ -12,7 +12,7 @@ export function configureMonaco(): Promise<void> {
   if (!configured) {
     configured = Promise.all([
       import("monaco-editor"),
-      import("monaco-editor/esm/vs/basic-languages/r/r.contribution.js"),
+      import("monaco-editor/languages/definitions/r/register"),
     ]).then(([monaco]) => {
       loader.config({ monaco })
     })
